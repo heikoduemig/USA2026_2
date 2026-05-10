@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Route 66 After Dark</title>
+<meta name="theme-color" content="#070b12">
+
+<script>
+(async () => {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch(e){}
+})();
+</script>
+
+<style>
+body{
+ margin:0;
+ font-family:Inter,Arial,sans-serif;
+ background:linear-gradient(180deg,#071018,#05070c);
+ color:white;
+ padding:24px;
+}
+.hero{
+ padding:30px;
+ border-radius:28px;
+ background:rgba(255,255,255,.05);
+ border:1px solid rgba(255,255,255,.08);
+ margin-bottom:24px;
+}
+h1{
+ font-size:64px;
+ margin:0 0 10px;
+ letter-spacing:-.06em;
+}
+.subtitle{
+ color:#8ef4ff;
+ line-height:1.5;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+ gap:18px;
+}
+.card{
+ background:#13202c;
+ border-radius:22px;
+ overflow:hidden;
+ border:1px solid rgba(255,255,255,.08);
+ box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+.image{
+ height:160px;
+ background:linear-gradient(135deg,rgba(70,214,230,.4),rgba(255,79,216,.35)),
+ url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80');
+ background-size:cover;
+ background-position:center;
+}
+.content{
+ padding:18px;
+}
+.city{
+ color:#8ef4ff;
+ font-size:14px;
+ text-transform:uppercase;
+ letter-spacing:.08em;
+}
+h2{
+ margin:6px 0 10px;
+ font-size:30px;
+}
+.badge{
+ display:inline-block;
+ background:#1a73e8;
+ padding:6px 10px;
+ border-radius:999px;
+ font-size:12px;
+ font-weight:700;
+ margin-right:8px;
+ margin-bottom:8px;
+}
+.score{
+ font-size:42px;
+ font-weight:900;
+ margin-top:8px;
+}
+.notice{
+ margin-top:18px;
+ padding:14px;
+ border-radius:18px;
+ background:rgba(255,200,87,.12);
+ border:1px solid rgba(255,200,87,.2);
+ color:#ffe19a;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Route 66 After Dark</h1>
+  <div class="subtitle">
+    Premium Nightlife Companion · Neon Design · WOW Edition<br>
+    Wichita wurde vollständig entfernt.
+  </div>
+
+  <div class="notice">
+    Diese Version löscht alte Service Worker und Browser-Caches automatisch.
+  </div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div class="image"></div>
+<div class="content">
+<div class="city">Chicago · 14–16.05.2026</div>
+<h2>Rick's Cabaret Chicago</h2>
+<div class="badge">⭐ 4.5</div>
+<div class="badge">Pflichtmarker</div>
+<div class="badge">Premium</div>
+<p>Großstadt-Vibe, hochwertige Auswahl und touristisch sehr geeignet.</p>
+<div class="score">9.2</div>
+<div>Nightlife Score</div>
+</div>
+</div>
+
+<div class="card">
+<div class="image"></div>
+<div class="content">
+<div class="city">St. Louis · 17–18.05.2026</div>
+<h2>Scarlett's Cabaret</h2>
+<div class="badge">⭐ 4.3</div>
+<div class="badge">Pflichtmarker</div>
+<p>Kompakte, seriöse Auswahl mit etablierten Cabaret-Locations.</p>
+<div class="score">7.4</div>
+<div>Nightlife Score</div>
+</div>
+</div>
+
+<div class="card">
+<div class="image"></div>
+<div class="content">
+<div class="city">Tulsa · 19.05.2026</div>
+<h2>Night Trips Tulsa</h2>
+<div class="badge">⭐ 4.2</div>
+<div class="badge">Top Rated</div>
+<p>Bekannteste Nightlife-Option der Stadt.</p>
+<div class="score">7.1</div>
+<div>Nightlife Score</div>
+</div>
+</div>
+
+<div class="card">
+<div class="image"></div>
+<div class="content">
+<div class="city">Lawton · 20.05.2026</div>
+<h2>Dragon West</h2>
+<div class="badge">⭐ 4.0</div>
+<div class="badge">Pflichtmarker</div>
+<p>Kleine, bewusst sauber kuratierte Auswahl.</p>
+<div class="score">5.7</div>
+<div>Nightlife Score</div>
+</div>
+</div>
+
+<div class="card">
+<div class="image"></div>
+<div class="content">
+<div class="city">Austin · 21–22.05.2026</div>
+<h2>Yellow Rose Austin</h2>
+<div class="badge">⭐ 4.6</div>
+<div class="badge">Premium</div>
+<div class="badge">Pflichtmarker</div>
+<p>Die stärkste Nightlife-Stadt der Route mit der größten Auswahl.</p>
+<div class="score">9.5</div>
+<div>Nightlife Score</div>
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
