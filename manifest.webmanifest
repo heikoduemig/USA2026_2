@@ -1,0 +1,10 @@
+{
+  "name": "Route 66 Adult Nightlife",
+  "short_name": "Nightlife",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070b0f",
+  "theme_color": "#161019",
+  "icons": []
+}
