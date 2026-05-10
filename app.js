@@ -1,67 +1,53 @@
 const DAYS = window.ADULT_DAYS || [];
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
-let selectedDayId = localStorage.getItem('selectedAfterDarkDay') || (DAYS[0] && DAYS[0].id) || '';
-let map, service, infoWindow, userMarker;
+const CITIES = [...new Set(PLACES.map(p => p.city))];
+let selectedCity = localStorage.getItem('selectedAfterDarkCity') || CITIES[0] || '';
+let map, service, infoWindow;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV5';
+const cacheKey = 'route66AfterDarkResolvedProV6';
 
-const CATEGORY_LABELS = {
-  all: 'Alle',
-  day: 'Heute',
-  top: 'Pflichtmarker',
-  rated: '4.2+',
-  nude: 'Nude / Adult',
-  tabledance: 'Tabledance',
-  cabaret: 'Cabaret / Show'
-};
 const BLOCKED_PLACE_PATTERNS = [/jaguar\s*land\s*rover/i, /3905\s+s\.?\s+memorial/i, /car\s+dealer/i, /auto/i];
-function placeGroup(p) {
-  if (p.group) return p.group;
-  const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
-  if (text.includes('cabaret') || text.includes('drag') || text.includes('show') || text.includes('casino')) return 'cabaret';
-  if (text.includes('table') || text.includes('steakhouse')) return 'tabledance';
-  return 'nude';
-}
-function isBlockedPlace(p) {
-  const text = `${p.name || ''} ${p.resolvedName || ''} ${p.formattedAddress || ''} ${p.address || ''}`;
-  return BLOCKED_PLACE_PATTERNS.some(rx => rx.test(text));
-}
-function matchesMarkerFilter(p, filter, day) {
-  if (isBlockedPlace(p)) return false;
-  if (filter === 'day') return placeMatchesDay(p, day);
-  if (filter === 'top') return p.priority === 'Pflichtmarker';
-  if (filter === 'rated') return Number(p.rating || 0) >= 4.2;
-  if (['nude','tabledance','cabaret'].includes(filter)) return placeGroup(p) === filter;
-  return true;
-}
+const LIGHT_MAP_STYLES = [
+  { elementType: 'geometry', stylers: [{ color: '#f5f7fa' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#334155' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#ffffff' }] },
+  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#cbd5e1' }] },
+  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eef2f7' }] },
+  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#dff3e5' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#e8eef5' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#d9e6f2' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9e7ff' }] }
+];
 
 function maps(q, placeId='') {
   const base = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   return placeId ? `${base}&query_place_id=${placeId}` : base;
 }
-function uber(q) {
-  return `https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]=${encodeURIComponent(q)}`;
+function websiteLink(p) { return p.website || maps(p.query || p.name, p.placeId || ''); }
+function citySlug(city) { return String(city).trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, ''); }
+function esc(value) { return String(value ?? '').replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch])); }
+function isBlockedPlace(p) {
+  const text = `${p.name || ''} ${p.resolvedName || ''} ${p.formattedAddress || ''} ${p.address || ''}`;
+  return BLOCKED_PLACE_PATTERNS.some(rx => rx.test(text));
 }
-function foodSearch(city) {
-  return maps(`late night food ${city}`);
+function uniquePlaces(list) {
+  const seen = new Set();
+  return list.filter(p => {
+    if (isBlockedPlace(p)) return false;
+    const key = `${p.name}|${p.city}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
-function weatherSearch(city) {
-  return `https://www.google.com/search?q=${encodeURIComponent('weather ' + city)}`;
-}
-function selectedDay() {
-  return DAYS.find(d => d.id === selectedDayId) || DAYS[0];
-}
-function status(msg) {
-  const el = document.getElementById('status');
-  if (el) el.textContent = msg;
-}
-function safeId(s) {
-  return String(s).trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
-}
-function esc(value) {
-  return String(value ?? '').replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch]));
+function placesForCity(city) {
+  const source = resolvedPlaces.length ? resolvedPlaces : PLACES;
+  return uniquePlaces(source.filter(p => p.city === city));
 }
 function setLazyBackgrounds(scope = document) {
   const items = [...scope.querySelectorAll('[data-bg]')];
@@ -82,39 +68,33 @@ function setLazyBackgrounds(scope = document) {
   }, { rootMargin: '280px 0px' });
   items.forEach(el => observer.observe(el));
 }
-function dayPlaces(day) {
-  const picks = day?.picks || [];
-  const source = resolvedPlaces.length ? resolvedPlaces : PLACES;
-  return source.filter(p => picks.includes(p.name));
+function status(msg) { const el = document.getElementById('status'); if (el) el.textContent = msg; }
+
+function markerColor(p, isSelected) {
+  if (p.priority === 'Pflichtmarker') return '#f59e0b';
+  if (p.priority === 'Special') return '#c026d3';
+  return isSelected ? '#0284c7' : '#64748b';
 }
-function placeMatchesDay(p, day) {
-  return p.city === day.city || (day.picks || []).includes(p.name);
-}
-function markerColor(p, isDay) {
-  if (p.priority === 'Pflichtmarker') return '#ffc857';
-  if (p.priority === 'Special') return '#ff4fd8';
-  return isDay ? '#46d6e6' : '#607d8b';
-}
-function markerIcon(p, isDay) {
-  const color = markerColor(p, isDay);
+function markerIcon(p, isSelected) {
   return {
     path: google.maps.SymbolPath.CIRCLE,
-    fillColor: color,
+    fillColor: markerColor(p, isSelected),
     fillOpacity: 1,
-    strokeColor: '#fff',
+    strokeColor: '#ffffff',
     strokeWeight: 2,
     scale: p.priority === 'Pflichtmarker' ? 10 : 8
   };
 }
 function popup(p) {
   const q = p.query || `${p.name} ${p.city}`;
-  return `<div style="max-width:280px;color:#111">
+  return `<div style="max-width:280px;color:#111;font-family:Arial,sans-serif">
     <h3 style="margin:0 0 8px">${esc(p.name)}</h3>
-    <p><strong>${esc(p.city)}</strong> · ${esc(p.priority)} · ${esc(CATEGORY_LABELS[placeGroup(p)] || placeGroup(p))}</p>
+    <p><strong>${esc(p.city)}</strong> · ${esc(p.priority)}</p>
     <p>${esc(p.vibe || '')}</p>
     <p>⭐ ${esc(p.rating || 'n/a')} ${p.ratingsTotal ? '(' + esc(p.ratingsTotal) + ')' : ''}</p>
     <p>${esc(p.formattedAddress || p.address || '')}</p>
     <a href="${maps(q, p.placeId || '')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;padding:8px 10px;border-radius:999px;background:#1a73e8;color:white;text-decoration:none;font-weight:700">Google Maps</a>
+    <a href="${websiteLink(p)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;margin-left:6px;padding:8px 10px;border-radius:999px;background:#111827;color:white;text-decoration:none;font-weight:700">Website</a>
   </div>`;
 }
 function resolveOne(raw) {
@@ -127,18 +107,7 @@ function resolveOne(raw) {
       if (resultStatus === google.maps.places.PlacesServiceStatus.OK && results && results[0]?.geometry) {
         const r = results[0];
         const photo = r.photos && r.photos[0] ? r.photos[0].getUrl({maxWidth: 1200, maxHeight: 800}) : raw.image;
-        resolve({
-          ...raw,
-          resolvedName: r.name || raw.name,
-          lat: r.geometry.location.lat(),
-          lng: r.geometry.location.lng(),
-          formattedAddress: r.formatted_address || raw.address || '',
-          placeId: r.place_id || '',
-          rating: r.rating || raw.rating || '',
-          ratingsTotal: r.user_ratings_total || '',
-          businessStatus: r.business_status || '',
-          image: photo || raw.image
-        });
+        resolve({ ...raw, resolvedName: r.name || raw.name, lat: r.geometry.location.lat(), lng: r.geometry.location.lng(), formattedAddress: r.formatted_address || raw.address || '', placeId: r.place_id || '', rating: r.rating || raw.rating || '', ratingsTotal: r.user_ratings_total || '', businessStatus: r.business_status || '', image: photo || raw.image });
       } else {
         resolve({...raw, error: resultStatus || 'NO_RESULT'});
       }
@@ -149,7 +118,7 @@ async function resolvePlaces() {
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     try {
-      resolvedPlaces = JSON.parse(cached).filter(p => !isBlockedPlace(p));
+      resolvedPlaces = uniquePlaces(JSON.parse(cached));
       status(`Google Places Cache geladen: ${resolvedPlaces.filter(p => p.lat).length} Orte`);
       return;
     } catch(e) {}
@@ -161,193 +130,111 @@ async function resolvePlaces() {
     if (!isBlockedPlace(resolved)) resolvedPlaces.push(resolved);
     await new Promise(r => setTimeout(r, 130));
   }
+  resolvedPlaces = uniquePlaces(resolvedPlaces);
   localStorage.setItem(cacheKey, JSON.stringify(resolvedPlaces));
   status(`Fertig: ${resolvedPlaces.filter(p => p.lat).length} Orte gefunden`);
 }
-function renderTabs() {
-  const tabs = document.getElementById('tabs');
-  tabs.innerHTML = DAYS.map(d => `<button type="button" class="${d.id === selectedDayId ? 'active' : ''}" data-id="${esc(d.id)}" aria-selected="${d.id === selectedDayId}">${esc(d.label)} · ${esc(d.city)}</button>`).join('');
-  tabs.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedDayId = btn.dataset.id;
-      localStorage.setItem('selectedAfterDarkDay', selectedDayId);
-      renderApp();
-      const target = document.getElementById('day-' + selectedDayId);
-      if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
-    });
-  });
+
+function renderCityNav() {
+  const nav = document.getElementById('city-nav');
+  if (!nav) return;
+  nav.innerHTML = CITIES.map(city => `<a class="${city === selectedCity ? 'active' : ''}" href="#city-${citySlug(city)}" onclick="selectCity('${esc(city)}', true)">${esc(city)}</a>`).join('');
 }
-function scoreBlock(meta) {
-  const s = meta?.scores || {nightlife:'-',safety:'-',tourist:'-',lateFood:'-'};
-  return `<div class="score-row">
-    <div class="score"><b>Nightlife</b><span>${s.nightlife}</span></div>
-    <div class="score"><b>Safety</b><span>${s.safety}</span></div>
-    <div class="score"><b>Tourist</b><span>${s.tourist}</span></div>
-    <div class="score"><b>Late Food</b><span>${s.lateFood}</span></div>
-  </div>`;
+function renderPicks() {
+  const picks = document.getElementById('picks');
+  picks.innerHTML = CITIES.map(city => {
+    const meta = CITY_META[city] || {};
+    const places = placesForCity(city);
+    const first = places.find(p => p.priority === 'Pflichtmarker') || places[0];
+    return `<button type="button" class="pick ${city === selectedCity ? 'active' : ''}" onclick="selectCity('${esc(city)}', true)"><b>${esc(city)}</b><span>${places.length} Lokalitäten · Top: ${esc(first?.name || 'TBD')}</span><div class="badges"><span class="badge gold">Score ${esc(meta.scores?.nightlife || '-')}/10</span><span class="badge">${esc(meta.hotel || '')}</span></div></button>`;
+  }).join('');
 }
-function card(p, idx, city) {
+function card(p, idx) {
   const img = p.image || PLACES.find(x => x.name === p.name)?.image || '';
-  const galleryImgs = [
-    img,
-    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=75',
-    'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=900&q=75'
-  ].filter(Boolean);
-  const detailsId = `details-${safeId(p.name)}-${idx}`;
-  const bg = `linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.28)),url('${img}')`;
+  const detailsId = `details-${citySlug(p.name)}-${idx}`;
+  const bg = `linear-gradient(135deg,rgba(70,214,230,.20),rgba(255,79,216,.16)),url('${img}')`;
   return `<article class="place">
     <div class="photo lazy-bg" data-bg="${esc(bg)}" role="img" aria-label="${esc(p.name)}"><span class="tier">${esc(p.priority)}</span></div>
     <div class="body">
       <h3>${esc(p.name)}</h3>
       <div class="badges"><span class="badge gold">⭐ ${esc(p.rating || '4.0+')}</span><span class="badge pink">${esc(p.category)}</span></div>
       <div class="meta">Dresscode: ${esc(p.dress || 'Casual gepflegt')}<br>Beste Zeit: ${esc(p.bestTime || '22:00–01:00')}<br>${esc(p.formattedAddress || p.address || '')}</div>
-      <div class="details" id="${detailsId}"><b>Touristen-Hinweis:</b> Vor Ort aktuelle Öffnungszeiten, Eintritt, Dresscode und Altersregel prüfen. ID mitnehmen und am besten Rideshare nutzen.
-        <div class="gallery">${galleryImgs.map(g => `<div class="lazy-bg" data-bg="url('${esc(g)}')" role="img" aria-label="Galeriebild ${esc(p.name)}"></div>`).join('')}</div>
-      </div>
+      <div class="details" id="${detailsId}"><b>Hinweis:</b> Vor Ort aktuelle Öffnungszeiten, Eintritt, Dresscode und Altersregel prüfen. ID mitnehmen und sicher per Rideshare/Taxi planen.</div>
       <div class="actions">
         <a href="${maps(p.query || p.name, p.placeId || '')}" target="_blank" rel="noopener">Google Maps</a>
-        <a href="${uber(p.query || p.name)}" target="_blank" rel="noopener">Uber</a>
-        <a href="${foodSearch(city)}" target="_blank" rel="noopener">Afterparty Food</a>
-        <a href="${weatherSearch(city)}" target="_blank" rel="noopener">Live Weather</a>
+        <a href="${websiteLink(p)}" target="_blank" rel="noopener">Website</a>
         <button type="button" aria-expanded="false" aria-controls="${detailsId}" onclick="toggleDetails(this)">Details</button>
       </div>
     </div>
   </article>`;
 }
-function renderDaySections() {
-  const days = document.getElementById('days');
-  days.innerHTML = DAYS.map(day => {
-    const meta = CITY_META[day.city] || {};
-    const places = dayPlaces(day);
-    return `<section class="glass day" id="day-${esc(day.id)}">
-      <div class="anchor" id="${safeId(day.city)}"></div>
-      <div class="date">${esc(day.label)} · ${esc(day.title)}</div>
-      <h2 class="city">${esc(day.city)}</h2>
-      <p class="vibe">${esc(day.note)}</p>
-      ${scoreBlock(meta)}
-      <div class="place-grid">${places.map((p, idx) => card(p, idx, day.city)).join('')}</div>
+function renderCitySections() {
+  const root = document.getElementById('days');
+  root.innerHTML = CITIES.map(city => {
+    const meta = CITY_META[city] || {};
+    const places = placesForCity(city);
+    const days = DAYS.filter(d => d.city === city).map(d => `${d.label} ${d.title}`).join(' · ');
+    return `<section class="glass day city-section" id="city-${citySlug(city)}">
+      <div class="date">${esc(days || 'Route 66')}</div>
+      <h2 class="city">${esc(city)}</h2>
+      <p class="vibe">${esc(meta.hotel ? 'Hotel: ' + meta.hotel : 'Ausgewählte Lokalitäten')}</p>
+      <div class="place-grid">${places.map((p, idx) => card(p, idx)).join('')}</div>
     </section>`;
   }).join('');
-  setLazyBackgrounds(days);
+  setLazyBackgrounds(root);
 }
-function renderPicks() {
-  const picks = document.getElementById('picks');
-  const cities = [...new Set(DAYS.map(d => d.city))];
-  picks.innerHTML = cities.map(city => {
-    const meta = CITY_META[city] || {};
-    const source = (resolvedPlaces.length ? resolvedPlaces : PLACES).filter(p => !isBlockedPlace(p));
-    const first = source.find(p => p.city === city && p.priority === 'Pflichtmarker') || source.find(p => p.city === city);
-    const count = source.filter(p => p.city === city).length;
-    return `<button type="button" class="pick" onclick="focusCity('${esc(city)}')"><b>${esc(city)}</b><span>${esc(first?.name || 'TBD')}</span><div class="badges"><span class="badge gold">⭐ ${esc(first?.rating || '4.0+')}</span><span class="badge pink">${count} Spots</span><span class="badge">Score ${esc(meta.scores?.nightlife || '-')}/10</span></div></button>`;
-  }).join('');
-}
-function renderMarkers(filter='all') {
+function renderMarkers(city = selectedCity) {
   if (!map) return;
   markers.forEach(m => m.setMap(null));
   markers = [];
   const bounds = new google.maps.LatLngBounds();
-  const day = selectedDay();
-  resolvedPlaces.forEach(p => {
+  const places = city === 'all' ? uniquePlaces(resolvedPlaces.length ? resolvedPlaces : PLACES) : placesForCity(city);
+  places.forEach(p => {
     if (!p.lat || !p.lng) return;
-    if (!matchesMarkerFilter(p, filter, day)) return;
-    const isDay = placeMatchesDay(p, day);
-    const marker = new google.maps.Marker({
-      map,
-      title: p.name,
-      position: {lat: p.lat, lng: p.lng},
-      icon: markerIcon(p, isDay),
-      animation: isDay ? google.maps.Animation.DROP : null
-    });
-    marker.addListener('click', () => {
-      infoWindow.setContent(popup(p));
-      infoWindow.open(map, marker);
-    });
-    markers.push(marker);
-    bounds.extend(marker.getPosition());
+    const marker = new google.maps.Marker({ map, title: p.name, position: {lat: p.lat, lng: p.lng}, icon: markerIcon(p, p.city === selectedCity), animation: p.city === selectedCity ? google.maps.Animation.DROP : null });
+    marker.addListener('click', () => { infoWindow.setContent(popup(p)); infoWindow.open(map, marker); });
+    markers.push(marker); bounds.extend(marker.getPosition());
   });
-  if (!bounds.isEmpty()) map.fitBounds(bounds, {top: 80, right: 40, bottom: 40, left: 40});
-  const filterLabel = CATEGORY_LABELS[filter] || filter;
-  status(`${markers.length} Marker · Filter: ${filterLabel}`);
+  if (!bounds.isEmpty()) map.fitBounds(bounds, {top: 72, right: 42, bottom: 42, left: 42});
+  const label = city === 'all' ? 'Alle Städte' : city;
+  status(`${markers.length} Marker · ${label}`);
   const countEl = document.getElementById('map-count');
-  if (countEl) countEl.textContent = `${markers.length} Spots · ${filterLabel}`;
+  if (countEl) countEl.textContent = `${markers.length} Spots · ${label}`;
 }
-function bindMapControls() {
-  document.querySelectorAll('[data-map-filter]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-map-filter]').forEach(b => b.classList.toggle('active', b === btn));
-      renderMarkers(btn.dataset.mapFilter);
-    });
-  });
+function selectCity(city, scroll = false) {
+  selectedCity = city;
+  localStorage.setItem('selectedAfterDarkCity', city);
+  renderCityNav();
+  renderPicks();
+  renderMarkers(city);
+  if (scroll) document.getElementById(`city-${citySlug(city)}`)?.scrollIntoView({behavior:'smooth', block:'start'});
 }
-function setActiveFilter(filter) { document.querySelectorAll('[data-map-filter]').forEach(b => b.classList.toggle('active', b.dataset.mapFilter === filter)); }
-function fitAll() { setActiveFilter('all'); renderMarkers('all'); }
-function focusCity(city) {
-  const meta = CITY_META[city];
-  if (meta?.center) map.setCenter(meta.center), map.setZoom(city === 'Austin' || city === 'Chicago' ? 11 : 12);
-}
-function nearMe() {
-  if (!navigator.geolocation) return alert('Geo-Location wird von diesem Browser nicht unterstützt.');
-  navigator.geolocation.getCurrentPosition(pos => {
-    const loc = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-    if (userMarker) userMarker.setMap(null);
-    userMarker = new google.maps.Marker({position: loc, map, title:'Du bist hier'});
-    map.setCenter(loc); map.setZoom(13);
-  }, () => alert('Standort konnte nicht gelesen werden.'));
-}
+function fitAll() { selectedCity = 'all'; renderMarkers('all'); renderCityNav(); }
 function toggleMode() {
   document.body.classList.toggle('light');
   localStorage.setItem('afterDarkMode', document.body.classList.contains('light') ? 'light' : 'dark');
 }
-function clearAppCache() {
-  localStorage.removeItem(cacheKey);
-  location.reload();
-}
+function clearAppCache() { localStorage.removeItem(cacheKey); location.reload(); }
 function toggleDetails(btn) {
   const card = btn.closest('.place');
   const isOpen = card.classList.toggle('open');
   btn.setAttribute('aria-expanded', String(isOpen));
 }
-function renderApp() {
-  renderTabs();
-  renderPicks();
-  renderDaySections();
-  renderMarkers(document.querySelector('[data-map-filter].active')?.dataset.mapFilter || 'all');
-}
+function renderApp() { renderCityNav(); renderPicks(); renderCitySections(); renderMarkers(selectedCity && selectedCity !== 'all' ? selectedCity : CITIES[0]); }
 function initMap() {
   if (localStorage.getItem('afterDarkMode') === 'light') document.body.classList.add('light');
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 38.5, lng: -94.5},
-    zoom: 5,
-    mapId: undefined,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true,
-    gestureHandling: 'greedy',
-    clickableIcons: false,
-    styles: [
-      {elementType:'geometry',stylers:[{color:'#071018'}]},
-      {elementType:'labels.text.stroke',stylers:[{color:'#071018'}]},
-      {elementType:'labels.text.fill',stylers:[{color:'#8ef4ff'}]},
-      {featureType:'road',elementType:'geometry',stylers:[{color:'#1b2b38'}]},
-      {featureType:'water',elementType:'geometry',stylers:[{color:'#05131f'}]},
-      {featureType:'poi',elementType:'labels.text.fill',stylers:[{color:'#ffb4ef'}]},
-      {featureType:'administrative',elementType:'geometry.stroke',stylers:[{color:'#274b59'}]}
-    ]
+    center: {lat: 38.5, lng: -94.5}, zoom: 5, mapTypeControl: false, streetViewControl: false, fullscreenControl: true, gestureHandling: 'greedy', clickableIcons: false, styles: LIGHT_MAP_STYLES
   });
   service = new google.maps.places.PlacesService(map);
   infoWindow = new google.maps.InfoWindow();
-  bindMapControls();
   renderApp();
   resolvePlaces().then(renderApp);
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js?v=pro5').catch(() => {});
-  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro6').catch(() => {});
 }
 window.initMap = initMap;
 window.toggleMode = toggleMode;
-window.nearMe = nearMe;
-window.fitAll = fitAll;
-window.focusCity = focusCity;
 window.clearAppCache = clearAppCache;
-
 window.toggleDetails = toggleDetails;
+window.selectCity = selectCity;
+window.fitAll = fitAll;

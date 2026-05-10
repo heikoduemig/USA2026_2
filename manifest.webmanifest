@@ -1,13 +1,13 @@
 {
   "name": "Route 66 After Dark PRO",
   "short_name": "After Dark",
-  "description": "Mobile- und Desktop-optimierter Route 66 Nightlife Companion mit Google Maps, Places und PWA Offline Cache.",
-  "start_url": "./index.html?v=pro5",
+  "description": "Mobile- und Desktop-optimierter Route 66 Nightlife Companion mit heller Google Map, Stadtfiltern, Places und PWA Offline Cache.",
+  "start_url": "./index.html?v=pro6",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#070b12",
-  "theme_color": "#070b12",
+  "background_color": "#f5f7fa",
+  "theme_color": "#f5f7fa",
   "categories": [
     "travel",
     "navigation",
