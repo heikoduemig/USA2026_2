@@ -1,106 +1,44 @@
-
 <!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Route 66 After Dark</title>
-<link rel="manifest" href="manifest.webmanifest">
+<title>Route 66 After Dark WOW v2</title>
 <meta name="theme-color" content="#070b12">
 <style>
-:root{
-  --bg:#070b12;--panel:rgba(18,27,39,.82);--panel2:rgba(25,39,54,.88);
-  --line:rgba(142,244,255,.18);--text:#f7fbff;--muted:#a8bbc8;
-  --cyan:#46d6e6;--gold:#ffc857;--blue:#1a73e8;--pink:#ff4fd8;--green:#66f2a6;
-  --shadow:0 22px 80px rgba(0,0,0,.42);--safe-bottom:env(safe-area-inset-bottom,0px);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;padding:0 0 calc(84px + var(--safe-bottom));
-  background:
-    radial-gradient(circle at 15% 0%,rgba(70,214,230,.22),transparent 30%),
-    radial-gradient(circle at 85% 10%,rgba(255,79,216,.16),transparent 28%),
-    linear-gradient(180deg,#071018,#05070c 60%,#070b12);
-  color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  overflow-x:hidden;
-}
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
-  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
-  background-size:38px 38px;mask-image:linear-gradient(180deg,rgba(0,0,0,.5),transparent 75%);
-}
-.hero{padding:28px 18px 18px;position:relative;overflow:hidden}
-.logo{
-  display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);
-  border-radius:999px;background:rgba(255,255,255,.06);color:#8ef4ff;font-weight:900;font-size:12px;letter-spacing:.12em;text-transform:uppercase
-}
-h1{font-size:clamp(34px,8vw,76px);line-height:.92;margin:18px 0 12px;letter-spacing:-.07em;text-shadow:0 0 28px rgba(70,214,230,.2)}
-.subtitle{max-width:900px;color:#c9d8df;font-size:17px;line-height:1.45}
-.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:22px}
-.glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));box-shadow:var(--shadow);backdrop-filter:blur(18px);border-radius:28px}
-.tonight{padding:18px;min-height:230px;position:relative;overflow:hidden}
-.tonight:after{content:"";position:absolute;right:-80px;top:-80px;width:220px;height:220px;border-radius:50%;background:rgba(255,200,87,.16);filter:blur(10px)}
-.tonight h2,.map-card h2{margin:0 0 12px;font-size:24px;letter-spacing:-.035em}
-.pick{display:grid;gap:10px}
-.pick-card{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(0,0,0,.2)}
-.pick-card b{display:block;font-size:18px}
-.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
-.badge{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:rgba(70,214,230,.14);color:#8ef4ff;font-size:12px;font-weight:900}
-.badge.gold{background:rgba(255,200,87,.18);color:#ffe19a}.badge.pink{background:rgba(255,79,216,.16);color:#ffb4ef}
-.map-card{padding:14px}
-#map{
-  height:430px;min-height:360px;border-radius:22px;overflow:hidden;background:
-  radial-gradient(circle at 30% 20%,rgba(70,214,230,.16),transparent 24%),
-  radial-gradient(circle at 70% 65%,rgba(255,79,216,.14),transparent 24%),
-  #0b141d;position:relative;border:1px solid rgba(255,255,255,.12)
-}
-.fake-map-label{position:absolute;inset:auto 16px 16px 16px;color:#d8edf2;font-size:13px;line-height:1.4;background:rgba(0,0,0,.44);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12)}
-.marker{position:absolute;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);background:var(--cyan);box-shadow:0 0 0 8px rgba(70,214,230,.12),0 0 28px rgba(70,214,230,.8);animation:pulse 1.9s infinite}
-.marker.must{background:var(--gold);box-shadow:0 0 0 8px rgba(255,200,87,.14),0 0 28px rgba(255,200,87,.9)}
-.marker.special{background:var(--pink);box-shadow:0 0 0 8px rgba(255,79,216,.14),0 0 28px rgba(255,79,216,.85)}
-.marker span{position:absolute;left:26px;top:-4px;white-space:nowrap;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 8px;color:#fff;font-size:11px;font-weight:900}
-@keyframes pulse{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15)}100%{transform:translate(-50%,-50%) scale(1)}}
-.tabs{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow:auto;padding:10px 14px;background:rgba(5,8,13,.84);backdrop-filter:blur(18px);border-block:1px solid rgba(255,255,255,.08)}
-.tabs button{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);color:#fff;padding:10px 13px;border-radius:999px;white-space:nowrap;font-weight:900}
-.tabs button.active{background:var(--blue);border-color:rgba(255,255,255,.24)}
-main{max-width:1480px;margin:0 auto;padding:18px}
-.day{margin:0 0 24px;padding:18px}
-.day-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:16px}
-.date{color:#8ef4ff;font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.city-title{margin:4px 0 0;font-size:clamp(28px,4vw,46px);letter-spacing:-.055em}
-.vibe{color:#bdd0d8;line-height:1.45;max-width:760px}
-.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
-.score{padding:13px;border-radius:18px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.09)}
-.score b{display:block;color:#8ef4ff;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-.score span{display:block;margin-top:4px;font-size:24px;font-weight:950}
-.place-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
-.place{overflow:hidden;border-radius:22px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.045);box-shadow:0 12px 35px rgba(0,0,0,.22)}
-.place-img{height:128px;background-size:cover;background-position:center;position:relative}
-.place-img:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.62))}
-.tier{position:absolute;left:12px;top:12px;z-index:2;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:950}
-.place-body{padding:14px}
-.place h3{margin:0 0 8px;font-size:19px;letter-spacing:-.025em}
-.meta{color:#c8d8df;font-size:13px;line-height:1.42}
-.details{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;color:#d8e5e9;font-size:13px;line-height:1.48;display:none}
-.place.open .details{display:block}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.actions a,.actions button{min-height:40px;border:0;border-radius:999px;padding:9px 12px;background:var(--blue);color:#fff;text-decoration:none;font-weight:900;font-size:12px;cursor:pointer}
-.actions button{background:rgba(255,255,255,.1)}
-.bottom{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 8px calc(8px + var(--safe-bottom));background:rgba(5,8,13,.9);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.1)}
-.bottom a{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:16px;background:rgba(255,255,255,.07);color:#fff;text-decoration:none;font-weight:900;font-size:12px}
-@media(max-width:860px){.hero-grid{grid-template-columns:1fr}.score-row{grid-template-columns:repeat(2,1fr)}main{padding:12px}.day{padding:14px;border-radius:22px}.day-head{grid-template-columns:1fr}.hero{padding-top:20px}}
+:root{--bg:#070b12;--panel:rgba(18,27,39,.84);--line:rgba(142,244,255,.18);--text:#f7fbff;--muted:#a8bbc8;--cyan:#46d6e6;--gold:#ffc857;--blue:#1a73e8;--pink:#ff4fd8;--shadow:0 22px 80px rgba(0,0,0,.42)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;padding:0 0 90px;background:radial-gradient(circle at 15% 0%,rgba(70,214,230,.25),transparent 30%),radial-gradient(circle at 85% 10%,rgba(255,79,216,.18),transparent 28%),linear-gradient(180deg,#071018,#05070c 65%,#070b12);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 78%)}
+.hero{padding:28px 18px 18px}.logo{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:#8ef4ff;font-weight:900;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(38px,8vw,78px);line-height:.9;margin:18px 0 12px;letter-spacing:-.075em;text-shadow:0 0 32px rgba(70,214,230,.24)}.subtitle{max-width:920px;color:#c9d8df;font-size:17px;line-height:1.45}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:22px}.glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));box-shadow:var(--shadow);backdrop-filter:blur(18px);border-radius:28px}
+.tonight,.map-card{padding:18px}.tonight h2,.map-card h2{margin:0 0 12px;font-size:25px;letter-spacing:-.04em}.pick-card{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(0,0,0,.22);margin-bottom:10px}.pick-card b{font-size:17px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.badge{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:rgba(70,214,230,.14);color:#8ef4ff;font-size:12px;font-weight:900}.gold{background:rgba(255,200,87,.18);color:#ffe19a}.pink{background:rgba(255,79,216,.16);color:#ffb4ef}
+#map{height:430px;min-height:360px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 30% 20%,rgba(70,214,230,.16),transparent 24%),radial-gradient(circle at 70% 65%,rgba(255,79,216,.14),transparent 24%),#0b141d;position:relative;border:1px solid rgba(255,255,255,.12)}.fake-map-label{position:absolute;inset:auto 16px 16px 16px;color:#d8edf2;font-size:13px;line-height:1.4;background:rgba(0,0,0,.44);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12)}
+.marker{position:absolute;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);background:var(--cyan);box-shadow:0 0 0 8px rgba(70,214,230,.12),0 0 28px rgba(70,214,230,.8);animation:pulse 1.9s infinite}.marker.must{background:var(--gold);box-shadow:0 0 0 8px rgba(255,200,87,.14),0 0 28px rgba(255,200,87,.9)}.marker.special{background:var(--pink);box-shadow:0 0 0 8px rgba(255,79,216,.14),0 0 28px rgba(255,79,216,.85)}.marker span{position:absolute;left:26px;top:-4px;white-space:nowrap;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900}@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.15)}}
+.tabs{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow:auto;padding:10px 14px;background:rgba(5,8,13,.86);backdrop-filter:blur(18px);border-block:1px solid rgba(255,255,255,.08)}.tabs a{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);color:#fff;padding:10px 13px;border-radius:999px;white-space:nowrap;font-weight:900;text-decoration:none}
+main{max-width:1480px;margin:0 auto;padding:18px}.day{margin:0 0 24px;padding:18px}.date{color:#8ef4ff;font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.city-title{margin:4px 0 8px;font-size:clamp(30px,4vw,48px);letter-spacing:-.055em}.vibe{color:#bdd0d8;line-height:1.45;max-width:760px}
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.score{padding:13px;border-radius:18px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.09)}.score b{display:block;color:#8ef4ff;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.score span{display:block;margin-top:4px;font-size:24px;font-weight:950}
+.place-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}.place{overflow:hidden;border-radius:22px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.045);box-shadow:0 12px 35px rgba(0,0,0,.22)}.place-img{height:128px;background:linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.28)),url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=900&q=80');background-size:cover;background-position:center;position:relative}.tier{position:absolute;left:12px;top:12px;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:950}.place-body{padding:14px}.place h3{margin:0 0 8px;font-size:19px;letter-spacing:-.025em}.meta{color:#c8d8df;font-size:13px;line-height:1.42}.details{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;color:#d8e5e9;font-size:13px;line-height:1.48;display:none}.place.open .details{display:block}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.actions a,.actions button{min-height:40px;border:0;border-radius:999px;padding:9px 12px;background:var(--blue);color:#fff;text-decoration:none;font-weight:900;font-size:12px;cursor:pointer}.actions button{background:rgba(255,255,255,.1)}
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:rgba(5,8,13,.9);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.1)}.bottom a{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:16px;background:rgba(255,255,255,.07);color:#fff;text-decoration:none;font-weight:900;font-size:12px}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}.score-row{grid-template-columns:repeat(2,1fr)}main{padding:12px}.day{padding:14px;border-radius:22px}}
 </style>
 </head>
 <body>
+<script>
+const DATA = {"route": [["14.05.2026", "Chicago"], ["15.05.2026", "Chicago"], ["16.05.2026", "Chicago"], ["17.05.2026", "St. Louis"], ["18.05.2026", "St. Louis"], ["19.05.2026", "Tulsa"], ["20.05.2026", "Lawton"], ["21.05.2026", "Austin"], ["22.05.2026", "Austin"]], "cities": {"Chicago": {"score": [9.2, 7.8, 9.0, 9.4], "vibe": "Premium-Clubs, Großstadt-Vibe und sehr gute touristische Auswahl.", "places": [["Rick's Cabaret Chicago", "Pflichtmarker", 4.5, "Premium / Business-Vibe"], ["Polekatz Chicago", "Top Rated", 4.6, "Großer Club"], ["The Gold Room Chicago", "Top Rated", 4.4, "Clubabend"], ["Deja Vu Showgirls Chicago", "Top Rated", 4.2, "Zentral"], ["The Baton Show Lounge", "Special", 4.7, "Cabaret / Show"]]}, "St. Louis": {"score": [7.4, 7.0, 7.6, 7.8], "vibe": "Kompakte Auswahl mit etablierten Cabaret-Optionen.", "places": [["Scarlett's Cabaret St. Louis", "Pflichtmarker", 4.3, "Premium-Wahl"], ["Country Rock Cabaret", "Top Rated", 4.1, "Lokaler Vibe"]]}, "Tulsa": {"score": [7.1, 7.5, 7.2, 7.0], "vibe": "Night Trips ist der klare Hauptmarker, ergänzt um lokale Alternativen.", "places": [["Night Trips Tulsa", "Pflichtmarker", 4.2, "Hauptoption"], ["Jaguars Tulsa", "Top Rated", 4.0, "Club-Alternative"], ["Lady Godiva's Tulsa", "Top Rated", 4.1, "Lokale Option"]]}, "Lawton": {"score": [5.7, 7.2, 6.2, 5.9], "vibe": "Kleine Auswahl — bewusst sauber kuratiert statt künstlich aufgebläht.", "places": [["Dragon West", "Pflichtmarker", 4.0, "Lokale Option"], ["Apache Casino Bar Area", "Special", 4.2, "Casino-Bar"]]}, "Austin": {"score": [9.5, 8.1, 9.2, 9.1], "vibe": "Stärkste Nightlife-Stadt der Route mit der größten Auswahl.", "places": [["Yellow Rose Austin", "Pflichtmarker", 4.6, "Upscale Klassiker"], ["Palazio Austin", "Pflichtmarker", 4.5, "Premium Cabaret"], ["XTC Cabaret Austin", "Top Rated", 4.2, "Später Abend"], ["Michelle's Beach House", "Top Rated", 4.3, "Steakhouse & Club"], ["Chicas Bonitas Austin", "Top Rated", 4.0, "Alternative"]]}}};
+function maps(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
+function uber(q){return 'https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]='+encodeURIComponent(q)}
+</script>
+
 <section class="hero">
-  <div class="logo">✦ Route 66 After Dark</div>
+  <div class="logo">✦ Route 66 After Dark · WOW v2</div>
   <h1>Nightlife Companion</h1>
-  <p class="subtitle">Seriöse, touristisch freundliche Adult-Nightlife-Auswahl für eure Route. Mit Pflichtmarkern, Top-Rated-Layer, Night Score, Neon-Map und aufklappbaren Club-Karten.</p>
+  <p class="subtitle">Seriöse, touristisch freundliche Adult-Nightlife-Auswahl. Mit Pflichtmarkern, Top-Rated-Layer, Night Scores, Neon-Map, Bildkarten und Google-Maps-/Uber-Buttons. Wichita ist vollständig entfernt.</p>
   <div class="hero-grid">
     <div class="glass tonight">
       <h2>Tonight Picks</h2>
-      <div id="tonightPicks" class="pick"></div>
+      <div id="picks"></div>
     </div>
     <div class="glass map-card" id="karte">
       <h2>Neon Map Preview</h2>
@@ -110,80 +48,51 @@ main{max-width:1480px;margin:0 auto;padding:18px}
         <div class="marker" style="left:52%;top:55%"><span>Tulsa</span></div>
         <div class="marker special" style="left:62%;top:68%"><span>Lawton</span></div>
         <div class="marker must" style="left:79%;top:82%"><span>Austin</span></div>
-        <div class="fake-map-label">Design-Map mit Glow-Markern. In GitHub Pages läuft sie sofort ohne API-Key. Optional kann hier später Google Maps eingebunden werden.</div>
+        <div class="fake-map-label">Glow-Marker nach Route. Diese Version ist absichtlich komplett in einer index.html gebündelt, damit GitHub Pages sofort die richtige WOW-Seite zeigt.</div>
       </div>
     </div>
   </div>
 </section>
+<nav class="tabs" id="tabs"></nav>
+<main id="days"></main>
+<nav class="bottom"><a href="#karte">Map</a><a href="#days">Tage</a><a href="#Austin">Austin</a><a href="#Chicago">Chicago</a></nav>
 
-<div class="tabs" id="tabs"></div>
-<main id="app"></main>
-
-<nav class="bottom">
-  <a href="#karte">Map</a>
-  <a href="#days">Tage</a>
-  <a href="#Austin">Austin</a>
-  <a href="#Chicago">Chicago</a>
-</nav>
-
-<script src="adultData.js"></script>
 <script>
-const imgPool=[
- "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=80",
- "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80",
- "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=900&q=80",
- "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=900&q=80",
- "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80"
-];
-const D=window.AFTER_DARK_DATA;
-const app=document.getElementById("app");
-const tabs=document.getElementById("tabs");
-const seen={};
-D.route.forEach((day,i)=>{
- const b=document.createElement("button");
- b.textContent=day.label.slice(0,5)+" · "+day.city;
- b.onclick=()=>document.getElementById("day-"+i).scrollIntoView({behavior:"smooth",block:"start"});
- tabs.appendChild(b);
- const city=D.cities[day.city];
- const topPick=city.places.find(p=>p.tier==="Pflichtmarker") || city.places[0];
- const sec=document.createElement("section");
- sec.className="glass day";
- sec.id="day-"+i;
- sec.innerHTML=`
- <div id="${day.city}"></div>
- <div class="day-head">
-  <div><div class="date">${day.label}</div><h2 class="city-title">${day.city}</h2><p class="vibe">${city.vibe}</p></div>
-  <div class="badges"><span class="badge gold">Tonight Pick: ${topPick.name}</span><span class="badge">Hotel: ${city.hotelQuery}</span></div>
- </div>
- <div class="score-row">
-  <div class="score"><b>Nightlife</b><span>${city.score.nightlife}</span></div>
-  <div class="score"><b>Safety</b><span>${city.score.safety}</span></div>
-  <div class="score"><b>Tourist</b><span>${city.score.tourist}</span></div>
-  <div class="score"><b>Late Food</b><span>${city.score.lateFood}</span></div>
- </div>
- <div class="place-grid">
- ${city.places.map((p,idx)=>`
-  <article class="place">
-   <div class="place-img" style="background-image:url('${imgPool[(idx+i)%imgPool.length]}')"><span class="tier">${p.tier}</span></div>
-   <div class="place-body">
-    <h3>${p.name}</h3>
-    <div class="badges"><span class="badge gold">⭐ ${p.rating}</span><span class="badge pink">${p.bestFor}</span></div>
-    <div class="meta">Beste Zeit: ${p.time}<br>Dresscode: ${p.dress}</div>
-    <div class="details"><b>Insider-Hinweis:</b> ${p.note}<br><br><b>Touristen-Tipp:</b> Vorher kurz Website/Google prüfen, ID mitnehmen, keine großen Bargeldbeträge offen zeigen.</div>
-    <div class="actions">
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.query)}" target="_blank" rel="noopener">Google Maps</a>
-      <a href="https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]=${encodeURIComponent(p.query)}" target="_blank" rel="noopener">Uber</a>
-      <button onclick="this.closest('.place').classList.toggle('open')">Details</button>
-    </div>
-   </div>
-  </article>`).join("")}
- </div>`;
- app.appendChild(sec);
+const picks = document.getElementById('picks');
+['Chicago','St. Louis','Tulsa','Lawton','Austin'].forEach(city=>{
+  const c=DATA.cities[city], p=c.places[0];
+  picks.innerHTML += `<div class="pick-card"><b>${city}: ${p[0]}</b><div class="badges"><span class="badge gold">⭐ ${p[2]}</span><span class="badge">${p[3]}</span><span class="badge pink">Score ${c.score[0]}/10</span></div></div>`;
 });
-const picks=document.getElementById("tonightPicks");
-["Chicago","St. Louis","Tulsa","Lawton","Austin"].forEach(c=>{
- const city=D.cities[c], p=city.places[0];
- picks.innerHTML += `<div class="pick-card"><b>${c}: ${p.name}</b><div class="badges"><span class="badge gold">⭐ ${p.rating}</span><span class="badge">${p.bestFor}</span><span class="badge pink">Score ${city.score.nightlife}/10</span></div></div>`;
+const tabs=document.getElementById('tabs'), days=document.getElementById('days');
+DATA.route.forEach((r,i)=>{
+  const [date,city]=r, c=DATA.cities[city];
+  const a=document.createElement('a'); a.href='#day-'+i; a.textContent=date.slice(0,5)+' · '+city; tabs.appendChild(a);
+  const section=document.createElement('section'); section.className='glass day'; section.id='day-'+i;
+  section.innerHTML = `
+    <div id="${city}"></div>
+    <div class="date">${date}</div>
+    <h2 class="city-title">${city}</h2>
+    <p class="vibe">${c.vibe}</p>
+    <div class="score-row">
+      <div class="score"><b>Nightlife</b><span>${c.score[0]}</span></div>
+      <div class="score"><b>Safety</b><span>${c.score[1]}</span></div>
+      <div class="score"><b>Tourist</b><span>${c.score[2]}</span></div>
+      <div class="score"><b>Late Food</b><span>${c.score[3]}</span></div>
+    </div>
+    <div class="place-grid">
+      ${c.places.map(p=>`
+      <article class="place">
+        <div class="place-img"><span class="tier">${p[1]}</span></div>
+        <div class="place-body">
+          <h3>${p[0]}</h3>
+          <div class="badges"><span class="badge gold">⭐ ${p[2]}</span><span class="badge pink">${p[3]}</span></div>
+          <div class="meta">Touristenfreundlich kuratiert · Bewertung über 4.0 · Wichita nicht enthalten</div>
+          <div class="details"><b>Hinweis:</b> Vor Ort immer aktuelle Öffnungszeiten prüfen, ID mitnehmen und Cash/Cards bewusst einsetzen.</div>
+          <div class="actions"><a href="${maps(p[0])}" target="_blank">Google Maps</a><a href="${uber(p[0])}" target="_blank">Uber</a><button onclick="this.closest('.place').classList.toggle('open')">Details</button></div>
+        </div>
+      </article>`).join('')}
+    </div>`;
+  days.appendChild(section);
 });
 </script>
 </body>
