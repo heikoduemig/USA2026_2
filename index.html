@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Route 66 After Dark PRO</title>
+<meta name="theme-color" content="#070b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css?v=pro9">
+</head>
+<body>
+<section class="hero">
+  <div class="logo">✦ Route 66 After Dark PRO</div>
+  <h1>Nightlife Companion</h1>
+  <p class="subtitle">Städteübersicht mit heller Google Map, direkten Stadtlinks und kompakten Website-Karten.</p>
+
+  <div class="tools">
+    <button onclick="nearMe()">Near me tonight</button>
+  </div>
+
+  <nav class="city-links" aria-label="Städte">
+    <a href="#chicago">Chicago</a>
+    <a href="#st-louis">St. Louis</a>
+    <a href="#tulsa">Tulsa</a>
+    <a href="#lawton">Lawton</a>
+    <a href="#austin">Austin</a>
+  </nav>
+
+  <div class="glass panel" id="karte">
+    <div class="map-head">
+      <h2>Google Map</h2>
+      <div class="map-city-buttons">
+        <button onclick="focusCity('Chicago')">Chicago</button>
+        <button onclick="focusCity('St. Louis')">St. Louis</button>
+        <button onclick="focusCity('Tulsa')">Tulsa</button>
+        <button onclick="focusCity('Lawton')">Lawton</button>
+        <button onclick="focusCity('Austin')">Austin</button>
+        <button onclick="fitAll()">Alle</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="status" id="status">App wird geladen…</div>
+  </div>
+</section>
+
+<main id="cities"></main>
+
+<nav class="bottom" aria-label="Schnellnavigation">
+  <a href="#karte">Map</a>
+  <a href="#chicago">Chicago</a>
+  <a href="#st-louis">St. Louis</a>
+  <a href="#austin">Austin</a>
+</nav>
+
+<script src="adultData.js?v=pro9"></script>
+<script src="app.js?v=pro9"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
+</body>
+</html>
