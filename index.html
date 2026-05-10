@@ -3,37 +3,27 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Route 66 Nightlife Map</title>
+<title>Route 66 Nightlife Final</title>
 <style>
-body{font-family:Arial,sans-serif;background:#0f1720;color:#fff;margin:0;padding:20px}
-.card{background:#17232d;padding:18px;border-radius:16px;margin-bottom:18px}
-h1,h2{margin-top:0}
-.primary{border-left:4px solid #46d6e6;padding-left:12px}
-.secondary{opacity:.9}
-.tag{display:inline-block;background:#1a73e8;padding:4px 8px;border-radius:999px;font-size:12px}
+body{font-family:Arial;background:#101820;color:#fff;padding:20px}
+.card{background:#1a2632;padding:16px;border-radius:14px;margin-bottom:12px}
 </style>
 </head>
 <body>
 <h1>Route 66 Adult Nightlife</h1>
+<p>Wichita wurde vollständig entfernt.</p>
 <div id="app"></div>
-<script src="adultData.js"></script>
 <script>
-const app=document.getElementById('app');
-window.ADULT_DATA.days.forEach(day=>{
- const div=document.createElement('div');
- div.className='card';
- div.innerHTML=`
- <h2>${day.date} · ${day.city}</h2>
- <div class="primary">
-   <h3>Pflichtmarker</h3>
-   ${day.primary.map(p=>`<p><strong>${p.name}</strong><br><span class="tag">${p.type}</span></p>`).join('')}
- </div>
- <div class="secondary">
-   <h3>Weitere Empfehlungen</h3>
-   ${day.secondary.map(s=>`<p><strong>${s.name}</strong><br><span class="tag">${s.type}</span></p>`).join('')}
- </div>`;
- app.appendChild(div);
+fetch('adultData.json')
+.then(r=>r.json())
+.then(data=>{
+ const app=document.getElementById('app');
+ data.route.forEach(item=>{
+   const div=document.createElement('div');
+   div.className='card';
+   div.innerHTML=`<strong>${item.date}</strong> · ${item.city}`;
+   app.appendChild(div);
+ });
 });
 </script>
 </body>
