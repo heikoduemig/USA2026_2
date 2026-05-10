@@ -4,54 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Route 66 After Dark PRO</title>
-<meta name="description" content="Mobile- und Desktop-optimierter Route 66 Nightlife Companion mit heller Google Map, Stadtfiltern, Places, PWA und Website-Links.">
-<meta name="theme-color" content="#f5f7fa">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://maps.googleapis.com">
-<link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=pro7">
+<link rel="stylesheet" href="styles.css?v=pro8">
 </head>
 <body>
-<section class="hero" aria-labelledby="app-title">
+<section class="hero">
   <div class="logo">✦ Route 66 After Dark PRO</div>
-  <h1 id="app-title">Nightlife Companion</h1>
-  <p class="subtitle">Übersichtlicher Route-66-Nightlife-Planer mit heller Google Map, Stadtfiltern, direkten Website-Links und sortierten Lokalitäten ohne doppelte Tageskarten.</p>
-  <nav class="city-nav" id="city-nav" aria-label="Direkt zu den Städten"></nav>
+  <h1>Nightlife Companion</h1>
+
   <div class="tools">
-    <button type="button" onclick="toggleMode()" aria-label="Darstellung zwischen Light und Dark Neon wechseln">Light / Dark Neon</button>
-    <button type="button" onclick="fitAll()">Alle Städte</button>
-    <button type="button" onclick="clearAppCache()">Cache aktualisieren</button>
+    <button onclick="nearMe()">Near me tonight</button>
   </div>
-  <div class="grid">
-    <div class="glass panel overview-panel">
-      <h2>Städte</h2>
-      <div id="picks"></div>
-      <div class="status" id="status" role="status" aria-live="polite">App wird geladen…</div>
-    </div>
-    <div class="glass panel" id="karte">
-      <div class="panel-head"><h2>Google Map</h2><span id="map-count">Stadtfilter</span></div>
-      <div id="map" role="application" aria-label="Interaktive Google Karte mit Nightlife-Zielen"></div>
-      <p class="map-note">Die Karte zeigt jeweils die ausgewählte Stadt. Dadurch werden doppelte Marker und falsche Mischtreffer reduziert.</p>
-    </div>
+
+  <nav class="city-links">
+    <a href="#chicago">Chicago</a>
+    <a href="#stlouis">St. Louis</a>
+    <a href="#tulsa">Tulsa</a>
+    <a href="#lawton">Lawton</a>
+    <a href="#austin">Austin</a>
+  </nav>
+
+  <div class="glass panel">
+    <h2>Google Map</h2>
+    <div id="map"></div>
   </div>
 </section>
 
-<main id="days" tabindex="-1"></main>
+<main id="days"></main>
 
-<nav class="bottom" aria-label="Schnellnavigation">
-  <a href="#karte">Map</a>
-  <a href="#city-chicago" onclick="selectCity('Chicago')">Chicago</a>
-  <a href="#city-tulsa" onclick="selectCity('Tulsa')">Tulsa</a>
-  <a href="#city-austin" onclick="selectCity('Austin')">Austin</a>
-</nav>
-
-<script src="adultData.js?v=pro7"></script>
-<script src="app.js?v=pro7"></script>
+<script src="adultData.js?v=pro8"></script>
+<script src="app.js?v=pro8"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
 </body>
 </html>
