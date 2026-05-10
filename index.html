@@ -5,49 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Route 66 After Dark PRO</title>
 <meta name="theme-color" content="#070b12">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
- integrity="sha256-p4NxAoJBhIINfQK8cm0E9qT24SxNHoB8BO6UC0H8nN8=" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
- integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-(async()=>{try{
- if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.unregister()));}
- if('caches' in window){const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k)));}
-}catch(e){}})();
-</script>
-<style>
-:root{--bg:#070b12;--panel:rgba(18,27,39,.86);--line:rgba(142,244,255,.18);--cyan:#46d6e6;--gold:#ffc857;--blue:#1a73e8;--pink:#ff4fd8;--muted:#bdd0d8}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;padding:0 0 88px;background:radial-gradient(circle at 15% 0%,rgba(70,214,230,.25),transparent 30%),radial-gradient(circle at 85% 10%,rgba(255,79,216,.18),transparent 28%),linear-gradient(180deg,#071018,#05070c 65%,#070b12);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-body:before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 78%)}
-.hero{padding:30px 18px 18px}.logo{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:#8ef4ff;font-weight:900;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-h1{font-size:clamp(40px,8vw,82px);line-height:.9;margin:18px 0 12px;letter-spacing:-.075em;text-shadow:0 0 32px rgba(70,214,230,.28)}.subtitle{max-width:960px;color:#c9d8df;font-size:17px;line-height:1.45}
-.grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:18px;margin-top:22px}.glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));box-shadow:0 22px 80px rgba(0,0,0,.42);backdrop-filter:blur(18px);border-radius:28px}.panel{padding:18px}.panel h2{margin:0 0 12px;font-size:25px;letter-spacing:-.04em}
-.pick{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(0,0,0,.22);margin-bottom:10px}.pick b{font-size:17px}.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.badge{display:inline-flex;padding:6px 9px;border-radius:999px;background:rgba(70,214,230,.14);color:#8ef4ff;font-size:12px;font-weight:900}.gold{background:rgba(255,200,87,.18);color:#ffe19a}.pink{background:rgba(255,79,216,.16);color:#ffb4ef}
-#map{height:560px;min-height:420px;border-radius:22px;overflow:hidden;background:#0b141d;border:1px solid rgba(255,255,255,.12)}.leaflet-container{background:#0b141d}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#111c26;color:#fff}.leaflet-popup-content{font-family:Inter,Arial,sans-serif}.map-popup b{font-size:15px}.map-popup a{display:inline-block;margin-top:8px;background:#1a73e8;color:#fff;padding:7px 10px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px}
-.pin{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.8);box-shadow:0 0 0 8px rgba(70,214,230,.16),0 0 26px rgba(70,214,230,.9);background:#46d6e6}.pin.must{background:#ffc857;box-shadow:0 0 0 8px rgba(255,200,87,.16),0 0 26px rgba(255,200,87,.95)}.pin.special{background:#ff4fd8;box-shadow:0 0 0 8px rgba(255,79,216,.16),0 0 26px rgba(255,79,216,.9)}
-.map-controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}.map-controls button{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);color:#fff;padding:9px 12px;border-radius:999px;font-weight:900;cursor:pointer}
-.tabs{position:sticky;top:0;z-index:900;display:flex;gap:8px;overflow:auto;padding:10px 14px;background:rgba(5,8,13,.86);backdrop-filter:blur(18px);border-block:1px solid rgba(255,255,255,.08)}.tabs a{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);color:#fff;padding:10px 13px;border-radius:999px;white-space:nowrap;font-weight:900;text-decoration:none}
-main{max-width:1480px;margin:0 auto;padding:18px}.day{margin:0 0 24px;padding:18px}.date{color:#8ef4ff;font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.city{margin:4px 0 8px;font-size:clamp(30px,4vw,48px);letter-spacing:-.055em}.vibe{color:var(--muted);line-height:1.45}
-.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.score{padding:13px;border-radius:18px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.09)}.score b{display:block;color:#8ef4ff;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.score span{display:block;margin-top:4px;font-size:24px;font-weight:950}
-.place-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}.place{overflow:hidden;border-radius:22px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.045);box-shadow:0 12px 35px rgba(0,0,0,.22)}.photo{height:128px;background:linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.28)),url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=900&q=80');background-size:cover;background-position:center;position:relative}.tier{position:absolute;left:12px;top:12px;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:950}.body{padding:14px}.place h3{margin:0 0 8px;font-size:19px;letter-spacing:-.025em}.meta{color:#c8d8df;font-size:13px;line-height:1.42}.details{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;color:#d8e5e9;font-size:13px;line-height:1.48;display:none}.place.open .details{display:block}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.actions a,.actions button{min-height:40px;border:0;border-radius:999px;padding:9px 12px;background:var(--blue);color:#fff;text-decoration:none;font-weight:900;font-size:12px;cursor:pointer}.actions button{background:rgba(255,255,255,.1)}
-.bottom{position:fixed;left:0;right:0;bottom:0;z-index:950;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:rgba(5,8,13,.9);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.1)}.bottom a{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:16px;background:rgba(255,255,255,.07);color:#fff;text-decoration:none;font-weight:900;font-size:12px}
-@media(max-width:960px){.grid{grid-template-columns:1fr}#map{height:56vh}.score-row{grid-template-columns:repeat(2,1fr)}main{padding:12px}.day{padding:14px;border-radius:22px}}
-</style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css?v=pro3">
 </head>
 <body>
-<script>
-const DATA = {"route": [["14.05.2026", "Chicago"], ["15.05.2026", "Chicago"], ["16.05.2026", "Chicago"], ["17.05.2026", "St. Louis"], ["18.05.2026", "St. Louis"], ["19.05.2026", "Tulsa"], ["20.05.2026", "Lawton"], ["21.05.2026", "Austin"], ["22.05.2026", "Austin"]], "cities": {"Chicago": {"center": [41.8781, -87.6298], "score": [9.2, 7.8, 9.0, 9.4], "vibe": "Premium-Clubs, Großstadt-Vibe und sehr gute touristische Auswahl.", "places": [["Rick's Cabaret Chicago", "Pflichtmarker", 4.5, "Premium / Business-Vibe", 41.8893, -87.6327, "Rick's Cabaret Chicago"], ["Polekatz Chicago", "Top Rated", 4.6, "Großer Club", 41.7006, -87.626, "Polekatz Chicago"], ["The Gold Room Chicago", "Top Rated", 4.4, "Clubabend", 41.8994, -87.6359, "The Gold Room Chicago Gentlemen's Club"], ["Deja Vu Showgirls Chicago", "Top Rated", 4.2, "Zentral", 41.8817, -87.6298, "Deja Vu Showgirls Chicago"], ["The Baton Show Lounge", "Special", 4.7, "Cabaret / Show", 41.8968, -87.6366, "The Baton Show Lounge Chicago"]]}, "St. Louis": {"center": [38.627, -90.1994], "score": [7.4, 7.0, 7.6, 7.8], "vibe": "Kompakte Auswahl mit etablierten Cabaret-Optionen.", "places": [["Scarlett's Cabaret St. Louis", "Pflichtmarker", 4.3, "Premium-Wahl", 38.7099, -90.302, "Scarlett's Cabaret St. Louis"], ["Country Rock Cabaret", "Top Rated", 4.1, "Lokaler Vibe", 38.625, -90.184, "Country Rock Cabaret St. Louis"]]}, "Tulsa": {"center": [36.154, -95.9928], "score": [7.1, 7.5, 7.2, 7.0], "vibe": "Night Trips ist der klare Hauptmarker, ergänzt um lokale Alternativen.", "places": [["Night Trips Tulsa", "Pflichtmarker", 4.2, "Hauptoption", 36.1394, -95.9865, "Night Trips Tulsa"], ["Jaguars Tulsa", "Top Rated", 4.0, "Club-Alternative", 36.1774, -95.9299, "Jaguars Tulsa"], ["Lady Godiva's Tulsa", "Top Rated", 4.1, "Lokale Option", 36.147, -95.984, "Lady Godiva's Tulsa"]]}, "Lawton": {"center": [34.6036, -98.3959], "score": [5.7, 7.2, 6.2, 5.9], "vibe": "Kleine Auswahl — bewusst sauber kuratiert statt künstlich aufgebläht.", "places": [["Dragon West", "Pflichtmarker", 4.0, "Lokale Option", 34.608, -98.39, "Dragon West Lawton"], ["Apache Casino Bar Area", "Special", 4.2, "Casino-Bar", 34.6085, -98.3877, "Apache Casino Hotel Lawton"]]}, "Austin": {"center": [30.2672, -97.7431], "score": [9.5, 8.1, 9.2, 9.1], "vibe": "Stärkste Nightlife-Stadt der Route mit der größten Auswahl.", "places": [["Yellow Rose Austin", "Pflichtmarker", 4.6, "Upscale Klassiker", 30.3566, -97.7129, "Yellow Rose Austin"], ["Palazio Austin", "Pflichtmarker", 4.5, "Premium Cabaret", 30.3668, -97.7204, "Palazio Austin"], ["XTC Cabaret Austin", "Top Rated", 4.2, "Später Abend", 30.2038, -97.7638, "XTC Cabaret Austin"], ["Michelle's Beach House", "Top Rated", 4.3, "Steakhouse & Club", 30.3648, -97.7186, "Michelle's Beach House Austin"], ["Chicas Bonitas Austin", "Top Rated", 4.0, "Alternative", 30.335, -97.704, "Chicas Bonitas Austin"]]}}};
-function maps(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
-function uber(q){return 'https://m.uber.com/ul/?action=setPickup&dropoff[formatted_address]='+encodeURIComponent(q)}
-</script>
 <section class="hero">
   <div class="logo">✦ Route 66 After Dark PRO</div>
   <h1>Nightlife Companion</h1>
-  <p class="subtitle">Vollversion mit echter interaktiver Karte, Tonight Picks, Tagesplan, Night Scores, aufklappbaren Karten sowie Google-Maps- und Uber-Buttons.</p>
+  <p class="subtitle">Premium-Webapp mit echter Google Maps / Places Integration, Tonight Picks, Light/Dark Neon Mode, Club-Galerien, animierten Markern, Geo-Location, Live Weather, Afterparty-Food Finder und sauberem PWA-Setup.</p>
+  <div class="tools">
+    <button onclick="toggleMode()">Light / Dark Neon</button>
+    <button onclick="nearMe()">Near me tonight</button>
+    <button onclick="fitAll()">Alle Ziele</button>
+    <button onclick="clearAppCache()">Cache aktualisieren</button>
+  </div>
   <div class="grid">
-    <div class="glass panel"><h2>Tonight Picks</h2><div id="picks"></div></div>
+    <div class="glass panel">
+      <h2>Tonight Picks</h2>
+      <div id="picks"></div>
+      <div class="status" id="status">App wird geladen…</div>
+    </div>
     <div class="glass panel" id="karte">
-      <h2>Interaktive Karte</h2>
+      <h2>Google Map</h2>
       <div id="map"></div>
       <div class="map-controls">
         <button onclick="focusCity('Chicago')">Chicago</button>
@@ -55,58 +36,27 @@ function uber(q){return 'https://m.uber.com/ul/?action=setPickup&dropoff[formatt
         <button onclick="focusCity('Tulsa')">Tulsa</button>
         <button onclick="focusCity('Lawton')">Lawton</button>
         <button onclick="focusCity('Austin')">Austin</button>
-        <button onclick="fitAll()">Alle Ziele</button>
+        <button data-map-filter="day">Heute</button>
+        <button data-map-filter="top">Pflichtmarker</button>
+        <button data-map-filter="rated">4.2+</button>
+        <button data-map-filter="all">Alle</button>
       </div>
     </div>
   </div>
 </section>
+
 <nav class="tabs" id="tabs"></nav>
 <main id="days"></main>
-<nav class="bottom"><a href="#karte">Map</a><a href="#days">Tage</a><a href="#Austin">Austin</a><a href="#Chicago">Chicago</a></nav>
 
-<script>
-const picks=document.getElementById('picks');
-['Chicago','St. Louis','Tulsa','Lawton','Austin'].forEach(city=>{
- const c=DATA.cities[city], p=c.places[0];
- picks.innerHTML+=`<div class="pick"><b>${city}: ${p[0]}</b><div class="badges"><span class="badge gold">⭐ ${p[2]}</span><span class="badge">${p[3]}</span><span class="badge pink">Score ${c.score[0]}/10</span></div></div>`;
-});
+<nav class="bottom">
+  <a href="#karte">Map</a>
+  <a href="#days">Tage</a>
+  <a href="#Austin">Austin</a>
+  <a href="#Chicago">Chicago</a>
+</nav>
 
-const tabs=document.getElementById('tabs'), days=document.getElementById('days');
-DATA.route.forEach((r,i)=>{
- const [date,city]=r, c=DATA.cities[city];
- tabs.innerHTML+=`<a href="#day-${i}">${date.slice(0,5)} · ${city}</a>`;
- days.innerHTML+=`<section class="glass day" id="day-${i}">
- <div id="${city}"></div><div class="date">${date}</div><h2 class="city">${city}</h2><p class="vibe">${c.vibe}</p>
- <div class="score-row"><div class="score"><b>Nightlife</b><span>${c.score[0]}</span></div><div class="score"><b>Safety</b><span>${c.score[1]}</span></div><div class="score"><b>Tourist</b><span>${c.score[2]}</span></div><div class="score"><b>Late Food</b><span>${c.score[3]}</span></div></div>
- <div class="place-grid">${c.places.map(p=>`<article class="place"><div class="photo"><span class="tier">${p[1]}</span></div><div class="body"><h3>${p[0]}</h3><div class="badges"><span class="badge gold">⭐ ${p[2]}</span><span class="badge pink">${p[3]}</span></div><div class="meta">Touristenfreundlich kuratiert · Bewertung über 4.0</div><div class="details"><b>Hinweis:</b> Vor Ort aktuelle Öffnungszeiten prüfen, ID mitnehmen und Cash/Cards bewusst einsetzen.</div><div class="actions"><a href="${maps(p[6])}" target="_blank">Google Maps</a><a href="${uber(p[6])}" target="_blank">Uber</a><button onclick="this.closest('.place').classList.toggle('open')">Details</button></div></div></article>`).join('')}</div>
- </section>`;
-});
-
-let map, markers=[], group;
-function pinIcon(tier){
- const cls = tier === 'Pflichtmarker' ? 'must' : (tier === 'Special' ? 'special' : '');
- return L.divIcon({className:'', html:`<div class="pin ${cls}"></div>`, iconSize:[24,24], iconAnchor:[12,12]});
-}
-function initMap(){
- map = L.map('map', {scrollWheelZoom:true});
- L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-   maxZoom: 19,
-   attribution: '&copy; OpenStreetMap'
- }).addTo(map);
- group = L.featureGroup().addTo(map);
- Object.entries(DATA.cities).forEach(([city,c])=>{
-   c.places.forEach(p=>{
-     const m=L.marker([p[4],p[5]], {icon:pinIcon(p[1])}).addTo(group);
-     m.bindPopup(`<div class="map-popup"><b>${p[0]}</b><br>${city} · ${p[1]}<br>⭐ ${p[2]} · ${p[3]}<br><a target="_blank" href="${maps(p[6])}">Google Maps öffnen</a></div>`);
-     markers.push({city, marker:m});
-   });
- });
- fitAll();
- setTimeout(()=>map.invalidateSize(),250);
-}
-function fitAll(){ if(group) map.fitBounds(group.getBounds().pad(.22)); }
-function focusCity(city){ const c=DATA.cities[city]; map.setView(c.center, city==='Austin'||city==='Chicago'?11:12); }
-window.addEventListener('load', initMap);
-</script>
+<script src="adultData.js?v=pro3"></script>
+<script src="app.js?v=pro3"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
 </body>
 </html>

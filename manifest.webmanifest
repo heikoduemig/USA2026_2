@@ -1,0 +1,9 @@
+{
+  "name": "Route 66 After Dark PRO",
+  "short_name": "After Dark",
+  "start_url": "./index.html?v=pro3",
+  "display": "standalone",
+  "background_color": "#070b12",
+  "theme_color": "#070b12",
+  "icons": []
+}
