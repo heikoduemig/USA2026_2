@@ -2,7 +2,7 @@
   "name": "Route 66 After Dark PRO",
   "short_name": "After Dark",
   "description": "Mobile- und Desktop-optimierter Route 66 Nightlife Companion mit Google Maps, Places und PWA Offline Cache.",
-  "start_url": "./index.html?v=pro4",
+  "start_url": "./index.html?v=pro5",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

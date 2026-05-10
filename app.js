@@ -5,7 +5,37 @@ let selectedDayId = localStorage.getItem('selectedAfterDarkDay') || (DAYS[0] && 
 let map, service, infoWindow, userMarker;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV4';
+const cacheKey = 'route66AfterDarkResolvedProV5';
+
+const CATEGORY_LABELS = {
+  all: 'Alle',
+  day: 'Heute',
+  top: 'Pflichtmarker',
+  rated: '4.2+',
+  nude: 'Nude / Adult',
+  tabledance: 'Tabledance',
+  cabaret: 'Cabaret / Show'
+};
+const BLOCKED_PLACE_PATTERNS = [/jaguar\s*land\s*rover/i, /3905\s+s\.?\s+memorial/i, /car\s+dealer/i, /auto/i];
+function placeGroup(p) {
+  if (p.group) return p.group;
+  const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
+  if (text.includes('cabaret') || text.includes('drag') || text.includes('show') || text.includes('casino')) return 'cabaret';
+  if (text.includes('table') || text.includes('steakhouse')) return 'tabledance';
+  return 'nude';
+}
+function isBlockedPlace(p) {
+  const text = `${p.name || ''} ${p.resolvedName || ''} ${p.formattedAddress || ''} ${p.address || ''}`;
+  return BLOCKED_PLACE_PATTERNS.some(rx => rx.test(text));
+}
+function matchesMarkerFilter(p, filter, day) {
+  if (isBlockedPlace(p)) return false;
+  if (filter === 'day') return placeMatchesDay(p, day);
+  if (filter === 'top') return p.priority === 'Pflichtmarker';
+  if (filter === 'rated') return Number(p.rating || 0) >= 4.2;
+  if (['nude','tabledance','cabaret'].includes(filter)) return placeGroup(p) === filter;
+  return true;
+}
 
 function maps(q, placeId='') {
   const base = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
@@ -80,7 +110,7 @@ function popup(p) {
   const q = p.query || `${p.name} ${p.city}`;
   return `<div style="max-width:280px;color:#111">
     <h3 style="margin:0 0 8px">${esc(p.name)}</h3>
-    <p><strong>${esc(p.city)}</strong> · ${esc(p.priority)}</p>
+    <p><strong>${esc(p.city)}</strong> · ${esc(p.priority)} · ${esc(CATEGORY_LABELS[placeGroup(p)] || placeGroup(p))}</p>
     <p>${esc(p.vibe || '')}</p>
     <p>⭐ ${esc(p.rating || 'n/a')} ${p.ratingsTotal ? '(' + esc(p.ratingsTotal) + ')' : ''}</p>
     <p>${esc(p.formattedAddress || p.address || '')}</p>
@@ -119,7 +149,7 @@ async function resolvePlaces() {
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     try {
-      resolvedPlaces = JSON.parse(cached);
+      resolvedPlaces = JSON.parse(cached).filter(p => !isBlockedPlace(p));
       status(`Google Places Cache geladen: ${resolvedPlaces.filter(p => p.lat).length} Orte`);
       return;
     } catch(e) {}
@@ -127,7 +157,8 @@ async function resolvePlaces() {
   resolvedPlaces = [];
   for (let i = 0; i < PLACES.length; i++) {
     status(`Google Places: ${i + 1} / ${PLACES.length}`);
-    resolvedPlaces.push(await resolveOne(PLACES[i]));
+    const resolved = await resolveOne(PLACES[i]);
+    if (!isBlockedPlace(resolved)) resolvedPlaces.push(resolved);
     await new Promise(r => setTimeout(r, 130));
   }
   localStorage.setItem(cacheKey, JSON.stringify(resolvedPlaces));
@@ -204,8 +235,10 @@ function renderPicks() {
   const cities = [...new Set(DAYS.map(d => d.city))];
   picks.innerHTML = cities.map(city => {
     const meta = CITY_META[city] || {};
-    const first = (resolvedPlaces.length ? resolvedPlaces : PLACES).find(p => p.city === city && p.priority === 'Pflichtmarker') || PLACES.find(p => p.city === city);
-    return `<div class="pick"><b>${esc(city)}: ${esc(first?.name || 'TBD')}</b><div class="badges"><span class="badge gold">⭐ ${esc(first?.rating || '4.0+')}</span><span class="badge">${esc(first?.vibe || '')}</span><span class="badge pink">Score ${esc(meta.scores?.nightlife || '-')}/10</span></div></div>`;
+    const source = (resolvedPlaces.length ? resolvedPlaces : PLACES).filter(p => !isBlockedPlace(p));
+    const first = source.find(p => p.city === city && p.priority === 'Pflichtmarker') || source.find(p => p.city === city);
+    const count = source.filter(p => p.city === city).length;
+    return `<button type="button" class="pick" onclick="focusCity('${esc(city)}')"><b>${esc(city)}</b><span>${esc(first?.name || 'TBD')}</span><div class="badges"><span class="badge gold">⭐ ${esc(first?.rating || '4.0+')}</span><span class="badge pink">${count} Spots</span><span class="badge">Score ${esc(meta.scores?.nightlife || '-')}/10</span></div></button>`;
   }).join('');
 }
 function renderMarkers(filter='all') {
@@ -216,9 +249,7 @@ function renderMarkers(filter='all') {
   const day = selectedDay();
   resolvedPlaces.forEach(p => {
     if (!p.lat || !p.lng) return;
-    if (filter === 'day' && !placeMatchesDay(p, day)) return;
-    if (filter === 'top' && p.priority !== 'Pflichtmarker') return;
-    if (filter === 'rated' && Number(p.rating || 0) < 4.2) return;
+    if (!matchesMarkerFilter(p, filter, day)) return;
     const isDay = placeMatchesDay(p, day);
     const marker = new google.maps.Marker({
       map,
@@ -235,6 +266,10 @@ function renderMarkers(filter='all') {
     bounds.extend(marker.getPosition());
   });
   if (!bounds.isEmpty()) map.fitBounds(bounds, {top: 80, right: 40, bottom: 40, left: 40});
+  const filterLabel = CATEGORY_LABELS[filter] || filter;
+  status(`${markers.length} Marker · Filter: ${filterLabel}`);
+  const countEl = document.getElementById('map-count');
+  if (countEl) countEl.textContent = `${markers.length} Spots · ${filterLabel}`;
 }
 function bindMapControls() {
   document.querySelectorAll('[data-map-filter]').forEach(btn => {
@@ -244,7 +279,8 @@ function bindMapControls() {
     });
   });
 }
-function fitAll() { renderMarkers('all'); }
+function setActiveFilter(filter) { document.querySelectorAll('[data-map-filter]').forEach(b => b.classList.toggle('active', b.dataset.mapFilter === filter)); }
+function fitAll() { setActiveFilter('all'); renderMarkers('all'); }
 function focusCity(city) {
   const meta = CITY_META[city];
   if (meta?.center) map.setCenter(meta.center), map.setZoom(city === 'Austin' || city === 'Chicago' ? 11 : 12);
@@ -275,7 +311,7 @@ function renderApp() {
   renderTabs();
   renderPicks();
   renderDaySections();
-  renderMarkers('all');
+  renderMarkers(document.querySelector('[data-map-filter].active')?.dataset.mapFilter || 'all');
 }
 function initMap() {
   if (localStorage.getItem('afterDarkMode') === 'light') document.body.classList.add('light');
@@ -304,7 +340,7 @@ function initMap() {
   renderApp();
   resolvePlaces().then(renderApp);
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js?v=pro4').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js?v=pro5').catch(() => {});
   }
 }
 window.initMap = initMap;
