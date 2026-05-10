@@ -1,68 +1,40 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Route 66 · Adult Nightlife</title>
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#161019">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Route 66 Nightlife Map</title>
 <style>
-:root{--bg:#070b0f;--panel:#111820;--panel2:#18111c;--line:rgba(255,255,255,.12);--text:#f7fbff;--muted:#aab7c1;--pink:#ff4f9a;--blue:#1a73e8;--cyan:#77efff;--shadow:0 18px 60px rgba(0,0,0,.45);--safe-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box} html{max-width:100%;overflow-x:hidden;scroll-behavior:smooth} body{max-width:100%;margin:0;padding:0 0 calc(78px + var(--safe-bottom));overflow-x:hidden;background:radial-gradient(circle at 20% -10%,rgba(255,79,154,.2),transparent 36%),radial-gradient(circle at 85% 10%,rgba(119,239,255,.12),transparent 28%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif} a,button{touch-action:manipulation;-webkit-tap-highlight-color:rgba(255,79,154,.18)}
-.day-hero{position:sticky;top:0;z-index:30;padding:14px 14px 10px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(22,16,25,.96),rgba(8,11,15,.94));box-shadow:0 10px 32px rgba(0,0,0,.22);backdrop-filter:blur(16px)}
-.day-tabs{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;padding-bottom:8px;scroll-snap-type:x proximity;scrollbar-width:none}.day-tabs::-webkit-scrollbar,.map-filters::-webkit-scrollbar{display:none}.day-tabs button{min-height:44px;padding:9px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:13px;font-weight:900;scroll-snap-align:start;white-space:nowrap}.day-tabs button.active{border-color:rgba(255,255,255,.28);background:linear-gradient(135deg,var(--pink),#7b61ff)}
-.today-card{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:linear-gradient(135deg,rgba(255,79,154,.15),rgba(26,115,232,.14));box-shadow:var(--shadow)}.today-card h1{margin:0;font-size:clamp(24px,4vw,38px);letter-spacing:-.04em;line-height:1.05}.today-card p{margin:7px 0 0;color:#d6e0e6;line-height:1.45}.today-facts{display:grid;gap:8px}.fact{padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:15px;background:rgba(0,0,0,.22)}.fact b{display:block;color:#ffb0d0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.fact span{display:block;margin-top:3px;color:#fff;font-weight:800}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{display:inline-flex;align-items:center;min-height:34px;padding:7px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.06);color:#fff;font-size:12px;font-weight:900}
-.map-wrap{position:relative;padding:12px 10px 10px;border-bottom:1px solid var(--line);border-radius:0 0 24px 24px;background:#05080b}#map{width:100%;height:54vh;min-height:390px;overflow:hidden;border-radius:20px;background:#eef3f4;box-shadow:var(--shadow)}.status{position:absolute;left:15px;bottom:15px;z-index:5;max-width:calc(100% - 30px);padding:10px 13px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(5,9,13,.85);color:#fff;font-size:13px}.map-layer-panel{position:absolute;top:14px;left:22px;z-index:10;display:flex;align-items:center;gap:8px;max-width:calc(100% - 44px);padding:10px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(5,9,13,.82);box-shadow:0 12px 34px rgba(0,0,0,.32);backdrop-filter:blur(14px)}.map-layer-panel span{color:#ffb0d0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}.map-filters{display:flex;gap:6px;overflow-x:auto}.map-filters button{min-height:38px;padding:8px 11px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.07);color:#fff;cursor:pointer;font-size:12px;font-weight:900;white-space:nowrap}.map-filters button.active{background:var(--blue)}
-main{max-width:1500px;margin:0 auto;padding:22px 18px 36px}.section{margin-bottom:20px;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:linear-gradient(180deg,rgba(17,24,31,.9),rgba(11,16,22,.88));box-shadow:0 14px 45px rgba(0,0,0,.24)}.meta{margin-bottom:8px;color:#ffb0d0;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.section h2{margin:0 0 12px;font-size:clamp(24px,2.5vw,34px);letter-spacing:-.035em;line-height:1.1}.note{color:var(--muted);line-height:1.55}.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}.place-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;min-height:76px;padding:12px;border:1px solid rgba(255,255,255,.09);border-left:4px solid var(--pink);border-radius:16px;background:rgba(255,255,255,.045)}.place-row strong{display:block;color:#fff;font-size:15px;line-height:1.25}.place-row span{display:block;margin-top:4px;color:#b9c8ce;font-size:13px;line-height:1.35}.place-row small{display:inline-block;margin-top:7px;padding:4px 8px;border-radius:999px;background:rgba(255,79,154,.16);color:#ffd1e4;font-weight:900}.place-row a,.button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border-radius:999px;background:var(--blue);color:#fff;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap}.actions{display:flex;flex-wrap:wrap;gap:8px}.city-block{margin:0 0 18px}.city-block h3{margin:0 0 10px;color:#ffb0d0;font-size:22px;letter-spacing:-.02em}.empty-hint{padding:12px;border:1px dashed rgba(255,255,255,.13);border-radius:14px;background:rgba(255,255,255,.04);color:var(--muted)}.bottom-nav{position:fixed;right:0;bottom:0;left:0;z-index:40;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px 8px calc(8px + var(--safe-bottom));border-top:1px solid rgba(255,255,255,.12);background:rgba(5,9,13,.92);backdrop-filter:blur(18px)}.bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:54px;border:1px solid rgba(255,255,255,.06);border-radius:16px;background:rgba(255,255,255,.045);color:#fff;text-decoration:none;font-size:11px;font-weight:900}.warning{border-left:4px solid #ffcc00;background:rgba(255,204,0,.08)}
-.gm-style .gm-style-iw-c{color:#111}@media(max-width:760px){.today-card{grid-template-columns:1fr}.map-layer-panel{right:16px;left:16px;align-items:flex-start;flex-direction:column}.map-filters{width:100%}#map{height:48vh;min-height:330px}main{padding:18px 12px 30px}.section{padding:18px}.place-row{grid-template-columns:1fr}.actions a{width:100%}}
+body{font-family:Arial,sans-serif;background:#0f1720;color:#fff;margin:0;padding:20px}
+.card{background:#17232d;padding:18px;border-radius:16px;margin-bottom:18px}
+h1,h2{margin-top:0}
+.primary{border-left:4px solid #46d6e6;padding-left:12px}
+.secondary{opacity:.9}
+.tag{display:inline-block;background:#1a73e8;padding:4px 8px;border-radius:999px;font-size:12px}
 </style>
 </head>
 <body>
-<section class="day-hero" id="tag">
-  <div class="day-tabs" id="dayTabs"></div>
-  <div class="today-card">
-    <div><h1 id="dayTitle">Adult Nightlife</h1><p id="dayNote"></p><div class="chips" id="dayChips"></div></div>
-    <div class="today-facts"><div class="fact"><b>Stadt</b><span id="dayCity"></span></div><div class="fact"><b>Plan</b><span>Nur seriöse Hauptoptionen · 18+/21+ prüfen</span></div></div>
-  </div>
-</section>
-<section class="map-wrap" id="karte">
-  <div id="map"></div>
-  <div class="map-layer-panel"><span>Filter</span><div class="map-filters" id="mapFilters"><button class="active" data-filter="all">Alle</button><button data-filter="day">Heute</button><button data-filter="Top">Top</button><button data-filter="Nudebar">Nudebar</button></div></div>
-  <div class="status" id="status">Karte wird geladen…</div>
-</section>
-<main>
-  <section class="section warning"><div class="meta">Hinweis</div><h2>Vorher kurz prüfen</h2><p class="note">Adult-Entertainment-Locations ändern Öffnungszeiten, Eintritt, Dresscode, Age Policy und BYOB/Alkohol-Regeln häufig. Diese Seite ist als kuratierte Vorauswahl gedacht; vor dem Losfahren Website oder Google Maps prüfen und möglichst per Rideshare fahren.</p></section>
-  <section class="section" id="tagesplan"><div class="meta">Tagesplan</div><h2>Empfehlungen für den gewählten Tag</h2><div id="dayList"></div></section>
-  <section class="section" id="alle"><div class="meta">Alle Städte</div><h2>Alle kuratierten Einträge</h2><div id="allList"></div></section>
-</main>
-<nav class="bottom-nav"><a href="#tag">Tag</a><a href="#karte">Karte</a><a href="#tagesplan">Liste</a></nav>
-<script src="./adultData.js"></script>
+<h1>Route 66 Adult Nightlife</h1>
+<div id="app"></div>
+<script src="adultData.js"></script>
 <script>
-const API_KEY = "AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY";
-const DAYS = window.ADULT_DAYS || [];
-const PLACES = window.ADULT_PLACES || [];
-let selectedDayId = localStorage.getItem('adultSelectedDay') || (DAYS[0] && DAYS[0].id) || '';
-let map, service, infoWindow, resolvedPlaces=[], markers=[];
-const cacheKey='route66AdultResolvedV1';
-function getSelectedDay(){return DAYS.find(d=>d.id===selectedDayId)||DAYS[0];}
-function setStatus(txt){document.getElementById('status').textContent=txt;}
-function mapsUrlFor(p){return p.placeId ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.resolvedName||p.name)}&query_place_id=${p.placeId}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.query||p.name+' '+p.city)}`;}
-function markerIcon(color){return{path:google.maps.SymbolPath.CIRCLE,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:9};}
-function placeMatchesDay(p,day){return day && (p.city===day.city || (day.picks||[]).includes(p.name));}
-function searchPlace(raw){return new Promise(resolve=>{service.findPlaceFromQuery({query:raw.query||`${raw.name} ${raw.city}`,fields:['name','geometry','formatted_address','place_id','rating','user_ratings_total','business_status']},(results,status)=>{if(status===google.maps.places.PlacesServiceStatus.OK&&results&&results[0]&&results[0].geometry){const r=results[0];resolve({...raw,resolvedName:r.name,lat:r.geometry.location.lat(),lng:r.geometry.location.lng(),formattedAddress:r.formatted_address||raw.address||'',placeId:r.place_id||'',rating:r.rating||'',ratingsTotal:r.user_ratings_total||'',businessStatus:r.business_status||''});}else resolve({...raw,formattedAddress:raw.address||'',error:status||'NO_RESULT'});});});}
-async function resolveAllPlaces(){const cached=localStorage.getItem(cacheKey);if(cached){try{resolvedPlaces=JSON.parse(cached);setStatus(`Geladen aus Cache: ${resolvedPlaces.filter(p=>p.lat).length} Orte`);return;}catch(e){}}resolvedPlaces=[];for(let i=0;i<PLACES.length;i++){setStatus(`Löse Orte auf… ${i+1} / ${PLACES.length}`);resolvedPlaces.push(await searchPlace(PLACES[i]));await new Promise(r=>setTimeout(r,120));}localStorage.setItem(cacheKey,JSON.stringify(resolvedPlaces));setStatus(`Fertig: ${resolvedPlaces.filter(p=>p.lat).length} Orte gefunden`);}
-function popup(p){const maps=mapsUrlFor(p);const rating=p.rating?`<p><strong>Bewertung:</strong> ${p.rating} ⭐ (${p.ratingsTotal||0})</p>`:'';const status=p.businessStatus?`<p><strong>Status:</strong> ${p.businessStatus}</p>`:'';return `<div style="max-width:280px;color:#111"><h3 style="margin:0 0 8px">${p.name}</h3><p><em>${p.category}</em></p><p>${p.vibe||''}</p><p>${p.formattedAddress||p.address||''}</p>${rating}${status}<p><strong>${p.priority}</strong></p><a href="${maps}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;padding:8px 10px;border-radius:999px;background:#1a73e8;color:white;text-decoration:none;font-weight:700">Google Maps</a></div>`;}
-function renderMarkers(filter='all'){markers.forEach(m=>m.setMap(null));markers=[];const day=getSelectedDay();let bounds=new google.maps.LatLngBounds();resolvedPlaces.forEach(p=>{if(!p.lat||!p.lng)return;if(filter==='day'&&!placeMatchesDay(p,day))return;if(filter==='Top'&&p.priority!=='Top')return;if(filter==='Nudebar'&&!/nude|nudebar|all nude|fully nude/i.test(p.category))return;const isDay=placeMatchesDay(p,day);const color=p.priority==='Top'?'#ff4f9a':(isDay?'#7b61ff':'#607d8b');const marker=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,title:p.name,icon:markerIcon(color)});marker.addListener('click',()=>{infoWindow.setContent(popup(p));infoWindow.open(map,marker);});markers.push(marker);bounds.extend(marker.getPosition());});if(!bounds.isEmpty())map.fitBounds(bounds,{top:80,right:40,bottom:40,left:40});}
-function row(p){const maps=mapsUrlFor(p);return `<div class="place-row"><div><strong>${p.name}</strong><span>${p.city} · ${p.category}<br>${p.vibe||''}</span><small>${p.priority}${p.rating?` · ${p.rating} ⭐ (${p.ratingsTotal||0})`:''}</small></div><div class="actions"><a href="${maps}" target="_blank" rel="noopener noreferrer">Maps</a><a class="button" href="${p.website}" target="_blank" rel="noopener noreferrer">Website</a></div></div>`;}
-function renderCityGrouped(container,places){const cities=[...new Set(places.map(p=>p.city))];container.innerHTML=cities.map(city=>`<div class="city-block"><h3>${city}</h3><div class="list">${places.filter(p=>p.city===city).map(row).join('')}</div></div>`).join('');}
-function renderDayView(){const day=getSelectedDay();document.getElementById('dayTitle').textContent=day.title;document.getElementById('dayNote').textContent=day.note;document.getElementById('dayCity').textContent=day.city;document.getElementById('dayChips').innerHTML=(day.picks||[]).map(x=>`<span class="chip">${x}</span>`).join('');document.getElementById('dayTabs').innerHTML=DAYS.map(d=>`<button class="${d.id===day.id?'active':''}" onclick="selectDay('${d.id}')">${d.label} · ${d.city}</button>`).join('');const dayPlaces=resolvedPlaces.length?resolvedPlaces.filter(p=>(day.picks||[]).includes(p.name)):PLACES.filter(p=>(day.picks||[]).includes(p.name));document.getElementById('dayList').innerHTML=dayPlaces.length?`<div class="list">${dayPlaces.map(row).join('')}</div>`:`<p class="empty-hint">Keine Einträge für diesen Tag.</p>`;if(resolvedPlaces.length)renderMarkers(document.querySelector('#mapFilters button.active')?.dataset.filter||'all');}
-function selectDay(id){selectedDayId=id;localStorage.setItem('adultSelectedDay',id);renderDayView();}
-function bindFilters(){document.querySelectorAll('#mapFilters button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('#mapFilters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMarkers(btn.dataset.filter);}));}
-async function initMap(){map=new google.maps.Map(document.getElementById('map'),{center:{lat:38.5,lng:-94.5},zoom:5,mapTypeControl:false,streetViewControl:false,fullscreenControl:true});service=new google.maps.places.PlacesService(map);infoWindow=new google.maps.InfoWindow();bindFilters();renderDayView();await resolveAllPlaces();renderDayView();renderMarkers('all');renderCityGrouped(document.getElementById('allList'),resolvedPlaces);if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{});}
-window.initMap=initMap;
+const app=document.getElementById('app');
+window.ADULT_DATA.days.forEach(day=>{
+ const div=document.createElement('div');
+ div.className='card';
+ div.innerHTML=`
+ <h2>${day.date} · ${day.city}</h2>
+ <div class="primary">
+   <h3>Pflichtmarker</h3>
+   ${day.primary.map(p=>`<p><strong>${p.name}</strong><br><span class="tag">${p.type}</span></p>`).join('')}
+ </div>
+ <div class="secondary">
+   <h3>Weitere Empfehlungen</h3>
+   ${day.secondary.map(s=>`<p><strong>${s.name}</strong><br><span class="tag">${s.type}</span></p>`).join('')}
+ </div>`;
+ app.appendChild(div);
+});
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
 </body>
 </html>
