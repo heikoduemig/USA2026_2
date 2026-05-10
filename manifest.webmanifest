@@ -1,10 +1,9 @@
 {
-  "name": "Route 66 Adult Nightlife",
-  "short_name": "Nightlife",
+  "name": "Route 66 After Dark",
+  "short_name": "After Dark",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "background_color": "#070b0f",
-  "theme_color": "#161019",
+  "background_color": "#070b12",
+  "theme_color": "#070b12",
   "icons": []
 }
