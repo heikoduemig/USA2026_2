@@ -1,4 +1,3 @@
-const GOOGLE_KEY = 'AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY';
 const DAYS = window.ADULT_DAYS || [];
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
@@ -6,7 +5,7 @@ let selectedDayId = localStorage.getItem('selectedAfterDarkDay') || (DAYS[0] && 
 let map, service, infoWindow, userMarker;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV3';
+const cacheKey = 'route66AfterDarkResolvedProV4';
 
 function maps(q, placeId='') {
   const base = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
@@ -29,7 +28,29 @@ function status(msg) {
   if (el) el.textContent = msg;
 }
 function safeId(s) {
-  return String(s).replace(/[^a-z0-9]+/gi, '-');
+  return String(s).trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+}
+function esc(value) {
+  return String(value ?? '').replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch]));
+}
+function setLazyBackgrounds(scope = document) {
+  const items = [...scope.querySelectorAll('[data-bg]')];
+  if (!items.length) return;
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(el => { el.style.backgroundImage = el.dataset.bg; el.removeAttribute('data-bg'); });
+    return;
+  }
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      el.style.backgroundImage = el.dataset.bg;
+      el.removeAttribute('data-bg');
+      el.classList.add('loaded');
+      observer.unobserve(el);
+    });
+  }, { rootMargin: '280px 0px' });
+  items.forEach(el => observer.observe(el));
 }
 function dayPlaces(day) {
   const picks = day?.picks || [];
@@ -58,11 +79,11 @@ function markerIcon(p, isDay) {
 function popup(p) {
   const q = p.query || `${p.name} ${p.city}`;
   return `<div style="max-width:280px;color:#111">
-    <h3 style="margin:0 0 8px">${p.name}</h3>
-    <p><strong>${p.city}</strong> · ${p.priority}</p>
-    <p>${p.vibe || ''}</p>
-    <p>⭐ ${p.rating || 'n/a'} ${p.ratingsTotal ? '(' + p.ratingsTotal + ')' : ''}</p>
-    <p>${p.formattedAddress || p.address || ''}</p>
+    <h3 style="margin:0 0 8px">${esc(p.name)}</h3>
+    <p><strong>${esc(p.city)}</strong> · ${esc(p.priority)}</p>
+    <p>${esc(p.vibe || '')}</p>
+    <p>⭐ ${esc(p.rating || 'n/a')} ${p.ratingsTotal ? '(' + esc(p.ratingsTotal) + ')' : ''}</p>
+    <p>${esc(p.formattedAddress || p.address || '')}</p>
     <a href="${maps(q, p.placeId || '')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;padding:8px 10px;border-radius:999px;background:#1a73e8;color:white;text-decoration:none;font-weight:700">Google Maps</a>
   </div>`;
 }
@@ -114,7 +135,7 @@ async function resolvePlaces() {
 }
 function renderTabs() {
   const tabs = document.getElementById('tabs');
-  tabs.innerHTML = DAYS.map(d => `<button class="${d.id === selectedDayId ? 'active' : ''}" data-id="${d.id}">${d.label} · ${d.city}</button>`).join('');
+  tabs.innerHTML = DAYS.map(d => `<button type="button" class="${d.id === selectedDayId ? 'active' : ''}" data-id="${esc(d.id)}" aria-selected="${d.id === selectedDayId}">${esc(d.label)} · ${esc(d.city)}</button>`).join('');
   tabs.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedDayId = btn.dataset.id;
@@ -138,24 +159,26 @@ function card(p, idx, city) {
   const img = p.image || PLACES.find(x => x.name === p.name)?.image || '';
   const galleryImgs = [
     img,
-    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80',
-    'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=900&q=80'
-  ];
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=75',
+    'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=900&q=75'
+  ].filter(Boolean);
+  const detailsId = `details-${safeId(p.name)}-${idx}`;
+  const bg = `linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.28)),url('${img}')`;
   return `<article class="place">
-    <div class="photo" style="background-image:linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.28)),url('${img}')"><span class="tier">${p.priority}</span></div>
+    <div class="photo lazy-bg" data-bg="${esc(bg)}" role="img" aria-label="${esc(p.name)}"><span class="tier">${esc(p.priority)}</span></div>
     <div class="body">
-      <h3>${p.name}</h3>
-      <div class="badges"><span class="badge gold">⭐ ${p.rating || '4.0+'}</span><span class="badge pink">${p.category}</span></div>
-      <div class="meta">Dresscode: ${p.dress || 'Casual gepflegt'}<br>Beste Zeit: ${p.bestTime || '22:00–01:00'}<br>${p.formattedAddress || p.address || ''}</div>
-      <div class="details"><b>Touristen-Hinweis:</b> Vor Ort aktuelle Öffnungszeiten, Eintritt, Dresscode und Altersregel prüfen. ID mitnehmen und am besten Rideshare nutzen.
-        <div class="gallery">${galleryImgs.map(g => `<div style="background-image:url('${g}')"></div>`).join('')}</div>
+      <h3>${esc(p.name)}</h3>
+      <div class="badges"><span class="badge gold">⭐ ${esc(p.rating || '4.0+')}</span><span class="badge pink">${esc(p.category)}</span></div>
+      <div class="meta">Dresscode: ${esc(p.dress || 'Casual gepflegt')}<br>Beste Zeit: ${esc(p.bestTime || '22:00–01:00')}<br>${esc(p.formattedAddress || p.address || '')}</div>
+      <div class="details" id="${detailsId}"><b>Touristen-Hinweis:</b> Vor Ort aktuelle Öffnungszeiten, Eintritt, Dresscode und Altersregel prüfen. ID mitnehmen und am besten Rideshare nutzen.
+        <div class="gallery">${galleryImgs.map(g => `<div class="lazy-bg" data-bg="url('${esc(g)}')" role="img" aria-label="Galeriebild ${esc(p.name)}"></div>`).join('')}</div>
       </div>
       <div class="actions">
         <a href="${maps(p.query || p.name, p.placeId || '')}" target="_blank" rel="noopener">Google Maps</a>
         <a href="${uber(p.query || p.name)}" target="_blank" rel="noopener">Uber</a>
         <a href="${foodSearch(city)}" target="_blank" rel="noopener">Afterparty Food</a>
         <a href="${weatherSearch(city)}" target="_blank" rel="noopener">Live Weather</a>
-        <button type="button" onclick="this.closest('.place').classList.toggle('open')">Details</button>
+        <button type="button" aria-expanded="false" aria-controls="${detailsId}" onclick="toggleDetails(this)">Details</button>
       </div>
     </div>
   </article>`;
@@ -165,15 +188,16 @@ function renderDaySections() {
   days.innerHTML = DAYS.map(day => {
     const meta = CITY_META[day.city] || {};
     const places = dayPlaces(day);
-    return `<section class="glass day" id="day-${day.id}">
+    return `<section class="glass day" id="day-${esc(day.id)}">
       <div class="anchor" id="${safeId(day.city)}"></div>
-      <div class="date">${day.label} · ${day.title}</div>
-      <h2 class="city">${day.city}</h2>
-      <p class="vibe">${day.note}</p>
+      <div class="date">${esc(day.label)} · ${esc(day.title)}</div>
+      <h2 class="city">${esc(day.city)}</h2>
+      <p class="vibe">${esc(day.note)}</p>
       ${scoreBlock(meta)}
       <div class="place-grid">${places.map((p, idx) => card(p, idx, day.city)).join('')}</div>
     </section>`;
   }).join('');
+  setLazyBackgrounds(days);
 }
 function renderPicks() {
   const picks = document.getElementById('picks');
@@ -181,7 +205,7 @@ function renderPicks() {
   picks.innerHTML = cities.map(city => {
     const meta = CITY_META[city] || {};
     const first = (resolvedPlaces.length ? resolvedPlaces : PLACES).find(p => p.city === city && p.priority === 'Pflichtmarker') || PLACES.find(p => p.city === city);
-    return `<div class="pick"><b>${city}: ${first?.name || 'TBD'}</b><div class="badges"><span class="badge gold">⭐ ${first?.rating || '4.0+'}</span><span class="badge">${first?.vibe || ''}</span><span class="badge pink">Score ${meta.scores?.nightlife || '-'}/10</span></div></div>`;
+    return `<div class="pick"><b>${esc(city)}: ${esc(first?.name || 'TBD')}</b><div class="badges"><span class="badge gold">⭐ ${esc(first?.rating || '4.0+')}</span><span class="badge">${esc(first?.vibe || '')}</span><span class="badge pink">Score ${esc(meta.scores?.nightlife || '-')}/10</span></div></div>`;
   }).join('');
 }
 function renderMarkers(filter='all') {
@@ -214,7 +238,10 @@ function renderMarkers(filter='all') {
 }
 function bindMapControls() {
   document.querySelectorAll('[data-map-filter]').forEach(btn => {
-    btn.addEventListener('click', () => renderMarkers(btn.dataset.mapFilter));
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-map-filter]').forEach(b => b.classList.toggle('active', b === btn));
+      renderMarkers(btn.dataset.mapFilter);
+    });
   });
 }
 function fitAll() { renderMarkers('all'); }
@@ -239,6 +266,11 @@ function clearAppCache() {
   localStorage.removeItem(cacheKey);
   location.reload();
 }
+function toggleDetails(btn) {
+  const card = btn.closest('.place');
+  const isOpen = card.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(isOpen));
+}
 function renderApp() {
   renderTabs();
   renderPicks();
@@ -254,6 +286,8 @@ function initMap() {
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: true,
+    gestureHandling: 'greedy',
+    clickableIcons: false,
     styles: [
       {elementType:'geometry',stylers:[{color:'#071018'}]},
       {elementType:'labels.text.stroke',stylers:[{color:'#071018'}]},
@@ -270,7 +304,7 @@ function initMap() {
   renderApp();
   resolvePlaces().then(renderApp);
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js?v=pro3').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js?v=pro4').catch(() => {});
   }
 }
 window.initMap = initMap;
@@ -279,3 +313,5 @@ window.nearMe = nearMe;
 window.fitAll = fitAll;
 window.focusCity = focusCity;
 window.clearAppCache = clearAppCache;
+
+window.toggleDetails = toggleDetails;
