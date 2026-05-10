@@ -1,35 +1,20 @@
-# Route 66 After Dark PRO v4
+# Route 66 After Dark PRO v7
 
-## Dateien
-- `index.html`
-- `adultData.js`
-- `styles.css`
-- `app.js`
-- `manifest.webmanifest`
-- `service-worker.js`
-- `icon-192.png`
-- `icon-512.png`
-
-## Neu in v4
-- Mobile/Desktop Feinschliff für kleine Displays und Ultrawide Desktop
-- verbesserte PWA-Metadaten inklusive Icons und Apple Touch Icon
-- Accessibility: ARIA Labels, Status-Live-Region, Fokuszustände, `aria-expanded` für Details
-- Lazy Loading für Karten- und Galerie-Hintergründe per IntersectionObserver
-- sauberere Anchor-IDs und Bottom-Navigation (`#austin`, `#chicago`)
-- aktive Kartenfilter optisch markiert
-- Reduced-Motion-Unterstützung
-- Service Worker Cache auf `pro4` versioniert
+## Änderungen gegenüber v6
+- Google Map auf wirklich helles, reduziertes Design umgestellt
+- Kartenlogik direkt auf Stadtfilter reduziert
+- Chicago und Austin komplett als Stadtsektionen zusammengefasst
+- Uber- und Live-Weather-Links entfernt
+- Website-Link pro Lokalität ergänzt
+- Zusätzliche Einträge für Chicago und Austin ergänzt
+- Obere Stadtlinks springen direkt zu den Lokalitäten
+- Jaguar-Händler-Fehltreffer bleibt geblockt
+- Cache/Assets auf `pro7` versioniert
 
 ## Upload
-1. GitHub-Verzeichnis komplett leeren oder alle bestehenden Dateien überschreiben.
+1. GitHub-Verzeichnis komplett leeren oder bestehende Dateien überschreiben.
 2. Alle Dateien aus diesem Paket hochladen.
 3. GitHub Pages 1–2 Minuten warten lassen.
-4. Seite mit `?v=pro4` öffnen.
+4. Seite mit `?v=pro7` öffnen.
 
-Beispiel:
-`https://heikoduemig.github.io/USA2026_2/?v=pro4`
-
-Falls alte Daten sichtbar bleiben: In der App auf **Cache aktualisieren** klicken oder Browser-Cache leeren.
-
-## Google API Key
-Der Key bleibt im Frontend, ist aber für GitHub Pages in Ordnung, wenn er per Domain Restriction und API Restriction abgesichert ist.
+Falls alte Daten sichtbar bleiben: In der App auf **Cache aktualisieren** klicken.

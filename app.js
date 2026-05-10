@@ -6,22 +6,21 @@ let selectedCity = localStorage.getItem('selectedAfterDarkCity') || CITIES[0] ||
 let map, service, infoWindow;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV6';
+const cacheKey = 'route66AfterDarkResolvedProV7';
 
 const BLOCKED_PLACE_PATTERNS = [/jaguar\s*land\s*rover/i, /3905\s+s\.?\s+memorial/i, /car\s+dealer/i, /auto/i];
 const LIGHT_MAP_STYLES = [
-  { elementType: 'geometry', stylers: [{ color: '#f5f7fa' }] },
+  { featureType: 'all', elementType: 'all', stylers: [{ saturation: -10 }, { lightness: 35 }] },
+  { elementType: 'geometry', stylers: [{ color: '#f8fafc' }] },
   { elementType: 'labels.text.fill', stylers: [{ color: '#334155' }] },
   { elementType: 'labels.text.stroke', stylers: [{ color: '#ffffff' }] },
-  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#cbd5e1' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eef2f7' }] },
+  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#f1f5f9' }] },
   { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#dff3e5' }] },
   { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
-  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#e8eef5' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#d9e6f2' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#e2e8f0' }] },
+  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#edf2f7' }] },
   { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9e7ff' }] }
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#dbeafe' }] }
 ];
 
 function maps(q, placeId='') {
@@ -173,9 +172,9 @@ function renderCitySections() {
   root.innerHTML = CITIES.map(city => {
     const meta = CITY_META[city] || {};
     const places = placesForCity(city);
-    const days = DAYS.filter(d => d.city === city).map(d => `${d.label} ${d.title}`).join(' · ');
+    const summary = city === 'Chicago' || city === 'Austin' ? 'Alle Abende zusammengefasst' : (DAYS.filter(d => d.city === city).map(d => d.label).join(' · ') || 'Route 66');
     return `<section class="glass day city-section" id="city-${citySlug(city)}">
-      <div class="date">${esc(days || 'Route 66')}</div>
+      <div class="date">${esc(summary)}</div>
       <h2 class="city">${esc(city)}</h2>
       <p class="vibe">${esc(meta.hotel ? 'Hotel: ' + meta.hotel : 'Ausgewählte Lokalitäten')}</p>
       <div class="place-grid">${places.map((p, idx) => card(p, idx)).join('')}</div>
@@ -224,13 +223,13 @@ function renderApp() { renderCityNav(); renderPicks(); renderCitySections(); ren
 function initMap() {
   if (localStorage.getItem('afterDarkMode') === 'light') document.body.classList.add('light');
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 38.5, lng: -94.5}, zoom: 5, mapTypeControl: false, streetViewControl: false, fullscreenControl: true, gestureHandling: 'greedy', clickableIcons: false, styles: LIGHT_MAP_STYLES
+    center: {lat: 38.5, lng: -94.5}, zoom: 5, mapTypeId: google.maps.MapTypeId.ROADMAP, mapTypeControl: false, streetViewControl: false, fullscreenControl: true, gestureHandling: 'greedy', clickableIcons: false, backgroundColor: '#f8fafc', styles: LIGHT_MAP_STYLES
   });
   service = new google.maps.places.PlacesService(map);
   infoWindow = new google.maps.InfoWindow();
   renderApp();
   resolvePlaces().then(renderApp);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro6').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro7').catch(() => {});
 }
 window.initMap = initMap;
 window.toggleMode = toggleMode;
