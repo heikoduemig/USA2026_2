@@ -1,10 +1,11 @@
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
 const CITY_ORDER = window.CITY_ORDER || [...new Set(PLACES.map(p => p.city))];
+
 let map, service, infoWindow, userMarker;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV9';
+const cacheKey = 'route66AfterDarkResolvedProV10';
 
 function slug(city){ return String(city).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function status(msg){ const el=document.getElementById('status'); if(el) el.textContent=msg; }
@@ -15,7 +16,7 @@ function maps(q, placeId='') {
 function isBadPlaceResult(raw, result){
   const address = (result.formatted_address || '').toLowerCase();
   const name = (result.name || '').toLowerCase();
-  if (raw.name.toLowerCase().includes('jaguar') && (address.includes('3905 s memorial') || name.includes('jaguar tulsa'))) return true;
+  if (raw.city === 'Tulsa' && (address.includes('3905 s memorial') || name.includes('jaguar tulsa'))) return true;
   return false;
 }
 function popup(p) {
@@ -53,7 +54,7 @@ function resolveOne(raw) {
 async function resolvePlaces() {
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
-    try { resolvedPlaces = JSON.parse(cached); status(`Google Places Cache geladen: ${resolvedPlaces.filter(p => p.lat).length} Orte`); renderMarkers(); return; } catch(e) {}
+    try { resolvedPlaces = JSON.parse(cached); status(`Google Places Cache geladen: ${resolvedPlaces.filter(p => p.lat).length} Orte`); renderMarkers(); renderCities(); return; } catch(e) {}
   }
   resolvedPlaces = [];
   for (let i = 0; i < PLACES.length; i++) {
@@ -64,31 +65,48 @@ async function resolvePlaces() {
   localStorage.setItem(cacheKey, JSON.stringify(resolvedPlaces));
   status(`Fertig: ${resolvedPlaces.filter(p => p.lat).length} Orte gefunden`);
   renderMarkers();
+  renderCities();
+}
+function scoreBlock(meta) {
+  const s = meta?.scores || {};
+  return `<div class="score-row">
+    <div class="score"><b>Nightlife</b><span>${s.nightlife || '-'}</span></div>
+    <div class="score"><b>Safety</b><span>${s.safety || '-'}</span></div>
+    <div class="score"><b>Tourist</b><span>${s.tourist || '-'}</span></div>
+    <div class="score"><b>Late Food</b><span>${s.lateFood || '-'}</span></div>
+  </div>`;
 }
 function card(p) {
   const img = p.image || '';
   return `<article class="place">
-    <div class="photo" loading="lazy" style="background-image:linear-gradient(135deg,rgba(70,214,230,.25),rgba(255,79,216,.18)),url('${img}')"><span class="tier">${p.priority}</span></div>
+    <div class="photo" style="background-image:linear-gradient(135deg,rgba(70,214,230,.26),rgba(255,79,216,.18)),url('${img}')"><span class="tier">${p.priority}</span></div>
     <div class="body">
       <h3>${p.name}</h3>
       <div class="badges"><span class="badge gold">⭐ ${p.rating || '4.0+'}</span><span class="badge pink">${p.category}</span></div>
       <div class="meta">${p.vibe || ''}<br>${p.formattedAddress || p.address || ''}</div>
       <div class="actions">
         <a href="${p.website || maps(p.query || p.name)}" target="_blank" rel="noopener">Website</a>
-        <a href="${maps(p.query || p.name, p.placeId || '')}" target="_blank" rel="noopener">Google Maps</a>
+        <a class="secondary" href="${maps(p.query || p.name, p.placeId || '')}" target="_blank" rel="noopener">Google Maps</a>
       </div>
     </div>
   </article>`;
 }
 function renderCities() {
   const root = document.getElementById('cities');
+  if (!root) return;
   const source = resolvedPlaces.length ? resolvedPlaces : PLACES;
   root.innerHTML = CITY_ORDER.map(city => {
     const meta = CITY_META[city] || {};
     const places = source.filter(p => p.city === city);
     return `<section class="glass city-section" id="${slug(city)}">
-      <h2>${city}</h2>
-      <p class="vibe">${meta.note || ''}</p>
+      <div class="city-top">
+        <div class="city-title">
+          <div class="eyebrow">${places.length} Locations</div>
+          <h2>${city}</h2>
+          <p class="vibe">${meta.note || ''}</p>
+        </div>
+        ${scoreBlock(meta)}
+      </div>
       <div class="place-grid">${places.map(card).join('')}</div>
     </section>`;
   }).join('');
@@ -108,8 +126,8 @@ function renderMarkers(city='all') {
 }
 function fitAll(){ renderMarkers('all'); }
 function focusCity(city){
-  const meta = CITY_META[city];
   renderMarkers(city);
+  const meta = CITY_META[city];
   if (meta?.center) { map.setCenter(meta.center); map.setZoom(city === 'Austin' || city === 'Chicago' ? 11 : 12); }
   const target = document.getElementById(slug(city));
   if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
@@ -130,14 +148,13 @@ function initMap() {
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: true,
-    // Keine Dark-Styles: Google Maps bleibt helles Standarddesign.
-    styles: []
+    styles: [] // Google Standard = hell
   });
   service = new google.maps.places.PlacesService(map);
   infoWindow = new google.maps.InfoWindow();
   renderCities();
-  resolvePlaces().then(renderCities);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro9').catch(() => {});
+  resolvePlaces();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro10').catch(() => {});
 }
 window.initMap = initMap;
 window.nearMe = nearMe;

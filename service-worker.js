@@ -1,10 +1,10 @@
-const CACHE_NAME = 'route66-after-dark-pro-v9-20260510';
+const CACHE_NAME = 'route66-after-dark-pro-v10-20260510';
 const APP_SHELL = [
   './',
-  './index.html?v=pro9',
-  './styles.css?v=pro9',
-  './app.js?v=pro9',
-  './adultData.js?v=pro9',
+  './index.html?v=pro10',
+  './styles.css?v=pro10',
+  './app.js?v=pro10',
+  './adultData.js?v=pro10',
   './manifest.webmanifest'
 ];
 
@@ -35,5 +35,5 @@ self.addEventListener('fetch', event => {
       caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)).catch(() => {});
     }
     return response;
-  }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html?v=pro9'))));
+  }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html?v=pro10'))));
 });
