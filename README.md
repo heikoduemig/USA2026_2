@@ -1,8 +1,15 @@
-# Route 66 After Dark Full App
+# Route 66 After Dark PRO
 
-Dieses Paket enthält nur:
+Enthält:
 - index.html
-- README.md
 
-Bitte das Repository vorher komplett leeren und dann diese beiden Dateien hochladen.
-Keine service-worker.js und kein manifest.webmanifest hochladen.
+Keine service-worker.js, kein manifest.webmanifest, keine adultData.js.
+Alles ist bewusst in einer Datei, damit GitHub Pages nach dem Cache-Problem stabil läuft.
+
+Features:
+- interaktive Leaflet/OpenStreetMap-Karte
+- City-Fokus Buttons
+- Pflichtmarker / Top Rated / Special Marker
+- Tagesplan
+- Night Scores
+- Google Maps und Uber Buttons
