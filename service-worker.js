@@ -1,50 +1,82 @@
-const CACHE_NAME = 'route66-after-dark-online-pwa-v2-20260512';
+const CACHE_NAME = 'route66-after-dark-pwa-v3-20260512';
+
 const APP_SHELL = [
   './',
   './index.html',
-  './index.html?v=online2',
-  './styles.css?v=online2',
-  './app.js?v=online2',
-  './adultData.js?v=online2',
+  './styles.css',
+  './app.js',
+  './adultData.js',
   './manifest.webmanifest',
-  './icons/icon-72.png', './icons/icon-96.png', './icons/icon-128.png', './icons/icon-144.png',
-  './icons/icon-152.png', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-384.png', './icons/icon-512.png',
-  './icons/maskable-192.png', './icons/maskable-512.png',
-  './screenshots/screenshot-wide.png', './screenshots/screenshot-mobile.png'
+  './icons/icon-72.png',
+  './icons/icon-96.png',
+  './icons/icon-128.png',
+  './icons/icon-144.png',
+  './icons/icon-152.png',
+  './icons/icon-180.png',
+  './icons/icon-192.png',
+  './icons/icon-384.png',
+  './icons/icon-512.png',
+  './icons/maskable-192.png',
+  './icons/maskable-512.png',
+  './screenshots/screenshot-wide.png',
+  './screenshots/screenshot-mobile.png'
 ];
 
-const SHOULD_NOT_CACHE = request => {
+const isLocalAsset = request => {
   const url = new URL(request.url);
-  return request.method !== 'GET'
-    || url.hostname.includes('googleapis.com')
-    || url.hostname.includes('gstatic.com')
-    || url.hostname.includes('google.com')
-    || url.hostname.includes('googleusercontent.com')
-    || url.hostname.includes('unsplash.com')
-    || url.protocol === 'chrome-extension:';
+  return request.method === 'GET' && url.origin === self.location.origin;
 };
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(APP_SHELL.map(async asset => {
+      const response = await fetch(asset, { cache: 'reload' });
+      if (response.ok) await cache.put(asset, response);
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', event => {
-  if (SHOULD_NOT_CACHE(event.request)) return;
   const request = event.request;
-  event.respondWith(
-    fetch(request).then(response => {
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+  if (!isLocalAsset(request)) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request);
+        const cache = await caches.open(CACHE_NAME);
+        cache.put('./index.html', fresh.clone()).catch(() => {});
+        return fresh;
+      } catch (_) {
+        return (await caches.match('./index.html')) || Response.error();
       }
-      return response;
-    }).catch(async () => {
-      const cached = await caches.match(request);
-      return cached || caches.match('./index.html') || caches.match('./');
-    })
-  );
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+
+    try {
+      const fresh = await fetch(request);
+      if (fresh.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, fresh.clone()).catch(() => {});
+      }
+      return fresh;
+    } catch (_) {
+      return Response.error();
+    }
+  })());
 });

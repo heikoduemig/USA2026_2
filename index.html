@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Route 66 After Dark · Online App Mobile Fix</title>
+<title>Route 66 After Dark</title>
 <meta name="theme-color" content="#070b12">
 <meta name="application-name" content="After Dark">
 <meta name="apple-mobile-web-app-title" content="After Dark">
@@ -15,13 +15,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=online2">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header class="hero">
-  <div class="logo">✦ Route 66 After Dark · Online PWA Mobile Fix</div>
+  <div class="logo">✦ Route 66 After Dark · Offline PWA</div>
   <h1>Route 66 Nightlife Trip</h1>
-  <p class="subtitle">Installierbare Online-App für den Startbildschirm: Live Google Map, Places-Daten, Reiseplan 14.05.–23.05.2026 und lokaler App-Shell-Cache.</p>
+  <p class="subtitle">Installierbare Offline-App für Route 66 Locations: Reiseplan, Städte, lokale Daten und optional Live Google Map bei Internet.</p>
 
   <div class="topbar">
     <button class="primary" onclick="nearMe()">Near me tonight</button>
@@ -49,7 +49,7 @@
   <section class="glass map-panel" id="karte">
     <div class="map-head">
       <div>
-        <div class="eyebrow">Online Google Map</div>
+        <div class="eyebrow">Karte</div>
         <h2>Locations nach Stadt</h2>
       </div>
       <div class="map-controls">
@@ -61,8 +61,9 @@
         <button onclick="fitAll()">Alle</button>
       </div>
     </div>
-    <div id="map"></div>
-    <div class="status" id="status">Online-App wird geladen…</div><div class="install-help">Installation: Android/Chrome über „App installieren“, iPhone/iPad über Safari → Teilen → Zum Home-Bildschirm.</div>
+    <div id="map" class="offline-map" aria-label="Route 66 Offline Karte"></div>
+    <div class="status" id="status">Offline-App wird geladen…</div>
+    <div class="install-help">Installation: Android/Chrome über „App installieren“, iPhone/iPad über Safari → Teilen → Zum Home-Bildschirm.</div>
   </section>
 </header>
 
@@ -75,8 +76,7 @@
   <a href="#austin">Austin</a>
 </nav>
 
-<script src="adultData.js?v=online2"></script>
-<script src="app.js?v=online2"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
+<script src="adultData.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

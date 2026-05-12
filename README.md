@@ -1,40 +1,29 @@
-# Route 66 After Dark Offline PWA v2
+# Route 66 After Dark · Offline PWA
 
-Diese Version ist als installierbare Offline-Web-App vorbereitet.
+Dieses Paket ist direkt für GitHub Pages vorbereitet.
 
-## Enthalten
-- Offline-App-Shell mit Service Worker
-- Web-App-Manifest mit Icons, Maskable Icons und Screenshots
-- Apple Touch Icon für iPhone/iPad
-- Installieren-Button für Chrome/Edge/Android
-- iOS-Hinweis über Teilen > Zum Home-Bildschirm
-- Keine Google Maps API, keine Places API, keine extern geladenen Bilder
+## Upload
 
-## Upload auf GitHub Pages
-Alle Dateien aus diesem Ordner in dein GitHub-Pages-Repository hochladen und danach `index.html` öffnen.
+1. Repository öffnen oder neu erstellen.
+2. Alle Dateien aus diesem Ordner ins Repository kopieren.
+3. GitHub → Settings → Pages.
+4. Source: `Deploy from a branch`, Branch: `main`, Folder: `/root`.
+5. Die Pages-URL öffnen und einmal online laden.
+6. Danach über Chrome/Android „App installieren“ oder iOS Safari → Teilen → „Zum Home-Bildschirm“ installieren.
 
-## Installation
-### iPhone / iPad
-Safari öffnen > Teilen > Zum Home-Bildschirm.
+## Was geändert wurde
 
-### Android
-Chrome öffnen > App installieren oder Zum Startbildschirm hinzufügen.
+- `icons/` und `screenshots/` sind als echte Ordner enthalten.
+- Der Service Worker cached nur lokale Dateien und bricht nicht mehr ab, wenn eine Datei fehlt.
+- Die App startet offline sofort mit lokaler Offline-Karte.
+- Google Maps wird erst dynamisch geladen, wenn Internet verfügbar ist.
+- Reiseplan, Städte und Locations sind offline nutzbar.
 
-### Windows / Mac
-Chrome oder Edge öffnen > Installieren-Symbol in der Adressleiste.
+## Test
 
-## Hinweis
-Website- und Google-Maps-Buttons sind weiterhin vorhanden, funktionieren aber nur mit Internet. Die App selbst, Karte, Städte und Locations sind offline verfügbar.
+Nach dem ersten Online-Aufruf:
 
-Wenn nach dem Upload eine alte Version erscheint: Browserdaten/Service Worker für die Domain löschen oder in DevTools > Application > Service Workers > Unregister.
+- DevTools → Application → Service Workers prüfen.
+- DevTools → Application → Cache Storage prüfen.
+- Danach Netzwerk auf Offline stellen und Seite neu laden.
 
-
-## v3 Reiseplan
-
-Struktur aktualisiert auf:
-- 14.05.2026 citizenM Chicago
-- 17.05.2026 Lumière at the Arch STL
-- 19.05.2026 The Mayo Tulsa
-- 20.05.2026 Apache Casino Hotel Lawton
-- 21.05.2026 citizenM Austin
-- 23.05.2026 Abreise Austin
