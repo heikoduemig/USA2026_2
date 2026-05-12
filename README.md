@@ -1,7 +1,29 @@
-# Route 66 After Dark PRO v10
+# Route 66 After Dark Offline PWA v2
 
-Wieder Dark-Neon Layout, alle Städte, helle Google Map, funktionierende Stadtanker.
+Diese Version ist als installierbare Offline-Web-App vorbereitet.
 
-Upload alle Dateien und danach `https://heikoduemig.github.io/USA2026_2/?v=pro10` öffnen.
+## Enthalten
+- Offline-App-Shell mit Service Worker
+- Web-App-Manifest mit Icons, Maskable Icons und Screenshots
+- Apple Touch Icon für iPhone/iPad
+- Installieren-Button für Chrome/Edge/Android
+- iOS-Hinweis über Teilen > Zum Home-Bildschirm
+- Keine Google Maps API, keine Places API, keine extern geladenen Bilder
 
-Falls weiterhin alte Version sichtbar ist: Browserdaten/Service Worker für die Domain löschen oder in DevTools Application > Service Workers > Unregister.
+## Upload auf GitHub Pages
+Alle Dateien aus diesem Ordner in dein GitHub-Pages-Repository hochladen und danach `index.html` öffnen.
+
+## Installation
+### iPhone / iPad
+Safari öffnen > Teilen > Zum Home-Bildschirm.
+
+### Android
+Chrome öffnen > App installieren oder Zum Startbildschirm hinzufügen.
+
+### Windows / Mac
+Chrome oder Edge öffnen > Installieren-Symbol in der Adressleiste.
+
+## Hinweis
+Website- und Google-Maps-Buttons sind weiterhin vorhanden, funktionieren aber nur mit Internet. Die App selbst, Karte, Städte und Locations sind offline verfügbar.
+
+Wenn nach dem Upload eine alte Version erscheint: Browserdaten/Service Worker für die Domain löschen oder in DevTools > Application > Service Workers > Unregister.
