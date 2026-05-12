@@ -1,3 +1,25 @@
+
+function registerServiceWorker(){
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js?v=online2', { scope: './' })
+      .then(() => { document.body.classList.add('sw-ready'); })
+      .catch(() => { status('Service Worker konnte nicht registriert werden. Bitte über HTTPS öffnen.'); });
+  });
+}
+registerServiceWorker();
+
+function initMapFallback(){
+  renderTripPlan();
+  renderCities();
+  const mapEl = document.getElementById('map');
+  if (mapEl && !window.google) {
+    mapEl.innerHTML = '<div class="map-fallback"><strong>Google Map ist gerade nicht verfügbar.</strong><br>Die App bleibt trotzdem installierbar und die Locations sind unten sichtbar.</div>';
+    status('Basis-App geladen. Für Live-Karte Internet/API-Key prüfen.');
+  }
+}
+setTimeout(() => { if (!window.google || !window.google.maps) initMapFallback(); }, 4500);
+
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
 const CITY_ORDER = window.CITY_ORDER || [...new Set(PLACES.map(p => p.city))];
@@ -6,7 +28,7 @@ const TRIP_STOPS = window.TRIP_STOPS || [];
 let map, service, infoWindow, userMarker;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedOnlinePwaV1';
+const cacheKey = 'route66AfterDarkResolvedOnlinePwaV2';
 
 function slug(city){ return String(city).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function status(msg){ const el=document.getElementById('status'); if(el) el.textContent=msg; }
@@ -172,7 +194,6 @@ function initMap() {
   service = new google.maps.places.PlacesService(map);
   infoWindow = new google.maps.InfoWindow();
   resolvePlaces();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=online1').catch(() => {});
 }
 
 let deferredInstallPrompt = null;

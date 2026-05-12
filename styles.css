@@ -96,3 +96,5 @@ main{max-width:1480px;margin:0 auto;padding:18px}
 .trip-card small{margin-top:auto;color:#bdd0d8;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
 .city-trip{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px}
 .city-trip span{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(255,200,87,.13);border:1px solid rgba(255,200,87,.22);color:#ffe19a;font-size:12px;font-weight:900}
+.map-fallback{height:100%;min-height:360px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:#10202a;background:linear-gradient(135deg,#eaf8fb,#f7f3ff);font-weight:800;line-height:1.45}
+.install-help{display:none;margin-top:10px;color:#8ef4ff;font-size:13px;font-weight:800}.sw-ready .install-help{display:block}
