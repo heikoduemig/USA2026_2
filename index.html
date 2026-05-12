@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Route 66 After Dark · Reise 14.–23.05.2026</title>
+<title>Route 66 After Dark · Online App</title>
 <meta name="theme-color" content="#070b12">
 <meta name="application-name" content="After Dark">
 <meta name="apple-mobile-web-app-title" content="After Dark">
@@ -15,16 +15,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=offline3">
+<link rel="stylesheet" href="styles.css?v=online1">
 </head>
 <body>
 <header class="hero">
-  <div class="logo">✦ Route 66 After Dark · Reiseplan 2026</div>
+  <div class="logo">✦ Route 66 After Dark · Online PWA</div>
   <h1>Route 66 Nightlife Trip</h1>
-  <p class="subtitle">Offline-App mit neuer Hotel-/Datumsstruktur vom 14.05. bis 23.05.2026. Alle Locations, Stadtlinks und Notizen bleiben lokal verfügbar.</p>
+  <p class="subtitle">Installierbare Online-App für den Startbildschirm: Live Google Map, Places-Daten, Reiseplan 14.05.–23.05.2026 und lokaler App-Shell-Cache.</p>
 
   <div class="topbar">
-    <button class="primary" onclick="nearMe()">Offline-Hinweis</button>
+    <button class="primary" onclick="nearMe()">Near me tonight</button>
     <button class="primary install-btn" onclick="installApp()">App installieren</button>
     <nav class="city-links" aria-label="Städte">
       <a href="#trip">Reiseplan</a>
@@ -49,8 +49,8 @@
   <section class="glass map-panel" id="karte">
     <div class="map-head">
       <div>
-        <div class="eyebrow">Offline Karte</div>
-        <h2>Route 66 Übersicht</h2>
+        <div class="eyebrow">Online Google Map</div>
+        <h2>Locations nach Stadt</h2>
       </div>
       <div class="map-controls">
         <button onclick="focusCity('Chicago')">Chicago</button>
@@ -61,8 +61,8 @@
         <button onclick="fitAll()">Alle</button>
       </div>
     </div>
-    <div id="map" class="offline-map" role="img" aria-label="Offline-Route mit Städten"></div>
-    <div class="status" id="status">Offline-Modus bereit.</div>
+    <div id="map"></div>
+    <div class="status" id="status">Online-App wird geladen…</div>
   </section>
 </header>
 
@@ -75,7 +75,8 @@
   <a href="#austin">Austin</a>
 </nav>
 
-<script src="adultData.js?v=offline3"></script>
-<script src="app-offline.js?v=offline3"></script>
+<script src="adultData.js?v=online1"></script>
+<script src="app.js?v=online1"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8644C1bG05JivRoEANWGzN4Tir4tnLvY&libraries=places&callback=initMap"></script>
 </body>
 </html>

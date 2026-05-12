@@ -1,11 +1,12 @@
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
 const CITY_ORDER = window.CITY_ORDER || [...new Set(PLACES.map(p => p.city))];
+const TRIP_STOPS = window.TRIP_STOPS || [];
 
 let map, service, infoWindow, userMarker;
 let resolvedPlaces = [];
 let markers = [];
-const cacheKey = 'route66AfterDarkResolvedProV10';
+const cacheKey = 'route66AfterDarkResolvedOnlinePwaV1';
 
 function slug(city){ return String(city).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function status(msg){ const el=document.getElementById('status'); if(el) el.textContent=msg; }
@@ -19,10 +20,30 @@ function isBadPlaceResult(raw, result){
   if (raw.city === 'Tulsa' && (address.includes('3905 s memorial') || name.includes('jaguar tulsa'))) return true;
   return false;
 }
+function renderTripPlan() {
+  const root = document.getElementById('trip-plan');
+  if (!root || !TRIP_STOPS.length) return;
+  root.innerHTML = TRIP_STOPS.map((stop, index) => {
+    const isDeparture = /abreise/i.test(stop.type || stop.hotel || '');
+    const href = stop.anchor ? `#${stop.anchor}` : `#${slug(stop.city)}`;
+    return `<a class="trip-card${isDeparture ? ' departure' : ''}" href="${href}">
+      <span class="trip-step">${String(index + 1).padStart(2,'0')}</span>
+      <span class="trip-date">${stop.weekday ? stop.weekday + ' · ' : ''}${stop.date}</span>
+      <strong>${stop.city}</strong>
+      <em>${stop.hotel}</em>
+      <small>${stop.type || ''}</small>
+    </a>`;
+  }).join('');
+}
+function cityTripLine(city) {
+  const stops = TRIP_STOPS.filter(s => s.city === city);
+  if (!stops.length) return '';
+  return `<div class="city-trip">${stops.map(s => `<span>${s.date} · ${s.hotel}</span>`).join('')}</div>`;
+}
 function popup(p) {
   const q = p.query || `${p.name} ${p.city}`;
   return `<div style="max-width:280px;color:#111">
-    <h3 style="margin:0 0 8px">${p.name}</h3>
+    <h3 style="margin:0 0 8px">${p.resolvedName || p.name}</h3>
     <p><strong>${p.city}</strong> · ${p.priority}</p>
     <p>${p.vibe || ''}</p>
     <p>⭐ ${p.rating || 'n/a'} ${p.ratingsTotal ? '(' + p.ratingsTotal + ')' : ''}</p>
@@ -58,7 +79,7 @@ async function resolvePlaces() {
   }
   resolvedPlaces = [];
   for (let i = 0; i < PLACES.length; i++) {
-    status(`Google Places: ${i + 1} / ${PLACES.length}`);
+    status(`Google Places online: ${i + 1} / ${PLACES.length}`);
     resolvedPlaces.push(await resolveOne(PLACES[i]));
     await new Promise(r => setTimeout(r, 120));
   }
@@ -101,8 +122,9 @@ function renderCities() {
     return `<section class="glass city-section" id="${slug(city)}">
       <div class="city-top">
         <div class="city-title">
-          <div class="eyebrow">${places.length} Locations</div>
+          <div class="eyebrow">${places.length} Locations · Online-App</div>
           <h2>${city}</h2>
+          ${cityTripLine(city)}
           <p class="vibe">${meta.note || ''}</p>
         </div>
         ${scoreBlock(meta)}
@@ -124,11 +146,11 @@ function renderMarkers(city='all') {
   });
   if (!bounds.isEmpty()) map.fitBounds(bounds, {top:70,right:40,bottom:40,left:40});
 }
-function fitAll(){ renderMarkers('all'); }
+function fitAll(){ renderMarkers('all'); document.getElementById('karte')?.scrollIntoView({behavior:'smooth', block:'start'}); }
 function focusCity(city){
   renderMarkers(city);
   const meta = CITY_META[city];
-  if (meta?.center) { map.setCenter(meta.center); map.setZoom(city === 'Austin' || city === 'Chicago' ? 11 : 12); }
+  if (map && meta?.center) { map.setCenter(meta.center); map.setZoom(city === 'Austin' || city === 'Chicago' ? 11 : 12); }
   const target = document.getElementById(slug(city));
   if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -142,22 +164,33 @@ function nearMe(){
   }, () => alert('Standort konnte nicht gelesen werden.'));
 }
 function initMap() {
+  renderTripPlan();
+  renderCities();
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 38.5, lng: -94.5},
-    zoom: 5,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true,
-    styles: [] // Google Standard = hell
+    center: {lat: 38.5, lng: -94.5}, zoom: 5, mapTypeControl: false, streetViewControl: false, fullscreenControl: true, styles: []
   });
   service = new google.maps.places.PlacesService(map);
   infoWindow = new google.maps.InfoWindow();
-  renderCities();
   resolvePlaces();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=pro10').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=online1').catch(() => {});
+}
+
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault(); deferredInstallPrompt = event; document.body.classList.add('can-install'); status('Online-App bereit. Du kannst sie jetzt installieren.');
+});
+window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; document.body.classList.remove('can-install'); status('App wurde installiert.'); });
+function installApp(){
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isStandalone) return alert('Die App ist bereits installiert bzw. läuft im App-Modus.');
+  if (deferredInstallPrompt) { deferredInstallPrompt.prompt(); deferredInstallPrompt.userChoice.finally(() => { deferredInstallPrompt = null; }); return; }
+  if (isIos) return alert('iPhone/iPad: In Safari öffnen, Teilen-Button antippen und „Zum Home-Bildschirm“ wählen.');
+  alert('Im Browser-Menü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen. Auf GitHub Pages funktioniert das über HTTPS.');
 }
 window.initMap = initMap;
 window.nearMe = nearMe;
 window.fitAll = fitAll;
 window.focusCity = focusCity;
-renderCities();
+window.installApp = installApp;
+document.addEventListener('DOMContentLoaded', () => { renderTripPlan(); renderCities(); });
