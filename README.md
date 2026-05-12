@@ -27,3 +27,14 @@ Chrome oder Edge öffnen > Installieren-Symbol in der Adressleiste.
 Website- und Google-Maps-Buttons sind weiterhin vorhanden, funktionieren aber nur mit Internet. Die App selbst, Karte, Städte und Locations sind offline verfügbar.
 
 Wenn nach dem Upload eine alte Version erscheint: Browserdaten/Service Worker für die Domain löschen oder in DevTools > Application > Service Workers > Unregister.
+
+
+## v3 Reiseplan
+
+Struktur aktualisiert auf:
+- 14.05.2026 citizenM Chicago
+- 17.05.2026 Lumière at the Arch STL
+- 19.05.2026 The Mayo Tulsa
+- 20.05.2026 Apache Casino Hotel Lawton
+- 21.05.2026 citizenM Austin
+- 23.05.2026 Abreise Austin

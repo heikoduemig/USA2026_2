@@ -1,29 +1,38 @@
+window.TRIP_STOPS = [
+  { date:'14.05.2026', weekday:'Do', city:'Chicago', hotel:'citizenM Chicago', type:'Ankunft / Hotel', anchor:'chicago' },
+  { date:'17.05.2026', weekday:'So', city:'St. Louis', hotel:'Lumière at the Arch STL', type:'Hotelwechsel', anchor:'st-louis' },
+  { date:'19.05.2026', weekday:'Di', city:'Tulsa', hotel:'The Mayo Tulsa', type:'Hotelwechsel', anchor:'tulsa' },
+  { date:'20.05.2026', weekday:'Mi', city:'Lawton', hotel:'Apache Casino Hotel Lawton', type:'Hotelwechsel', anchor:'lawton' },
+  { date:'21.05.2026', weekday:'Do', city:'Austin', hotel:'citizenM Austin', type:'Hotelwechsel', anchor:'austin' },
+  { date:'23.05.2026', weekday:'Sa', city:'Austin', hotel:'Abreise Austin', type:'Abreise', anchor:'austin' }
+];
+
 window.CITY_ORDER = ['Chicago','St. Louis','Tulsa','Lawton','Austin'];
 
 window.CITY_META = {
   'Chicago': {
     center:{lat:41.8781,lng:-87.6298},
-    note:'Chicago ist als eine Stadt zusammengefasst – keine Aufteilung nach Reisetagen.',
+    note:'14.–16.05.2026 · Hotel: citizenM Chicago. Chicago ist als eine Stadt zusammengefasst – keine Aufteilung nach Reisetagen.',
     scores:{nightlife:9.2,safety:7.8,tourist:9.0,lateFood:9.4}
   },
   'St. Louis': {
     center:{lat:38.6270,lng:-90.1994},
-    note:'Kompakte Auswahl, am besten per Rideshare planen.',
+    note:'17.–18.05.2026 · Hotel: Lumière at the Arch STL. Kompakte Auswahl, am besten per Rideshare planen.',
     scores:{nightlife:7.4,safety:7.0,tourist:7.6,lateFood:7.8}
   },
   'Tulsa': {
     center:{lat:36.1540,lng:-95.9928},
-    note:'Tulsa bewusst reduziert. Der falsche Jaguar-Autohaus-Treffer wird blockiert.',
+    note:'19.05.2026 · Hotel: The Mayo Tulsa. Tulsa bewusst reduziert.',
     scores:{nightlife:7.1,safety:7.5,tourist:7.2,lateFood:7.0}
   },
   'Lawton': {
     center:{lat:34.6036,lng:-98.3959},
-    note:'Kleine lokale Auswahl plus Casino-/Bar-Alternative.',
+    note:'20.05.2026 · Hotel: Apache Casino Hotel Lawton. Kleine lokale Auswahl plus Casino-/Bar-Alternative.',
     scores:{nightlife:5.7,safety:7.2,tourist:6.2,lateFood:5.9}
   },
   'Austin': {
     center:{lat:30.2672,lng:-97.7431},
-    note:'Austin ist als eine Stadt zusammengefasst und erweitert.',
+    note:'21.–22.05.2026 · Hotel: citizenM Austin. 23.05.2026 Abreise Austin. Austin ist als eine Stadt zusammengefasst und erweitert.',
     scores:{nightlife:9.5,safety:8.1,tourist:9.2,lateFood:9.1}
   }
 };

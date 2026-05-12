@@ -1,6 +1,7 @@
 const PLACES = window.ADULT_PLACES || [];
 const CITY_META = window.CITY_META || {};
 const CITY_ORDER = window.CITY_ORDER || [...new Set(PLACES.map(p => p.city))];
+const TRIP_STOPS = window.TRIP_STOPS || [];
 
 const CITY_POSITIONS = {
   'Chicago': {x: 80, y: 18},
@@ -16,6 +17,23 @@ function maps(q){ return `https://www.google.com/maps/search/?api=1&query=${enco
 function onlineWebsite(p){ return p.website || maps(p.query || `${p.name} ${p.city}`); }
 function cityCount(city){ return PLACES.filter(p => p.city === city).length; }
 
+function renderTripPlan() {
+  const root = document.getElementById('trip-plan');
+  if (!root || !TRIP_STOPS.length) return;
+  root.innerHTML = TRIP_STOPS.map((stop, index) => {
+    const isDeparture = /abreise/i.test(stop.type || stop.hotel || '');
+    const label = isDeparture ? 'Abreise' : stop.type;
+    const href = stop.anchor ? `#${stop.anchor}` : `#${slug(stop.city)}`;
+    return `<a class="trip-card${isDeparture ? ' departure' : ''}" href="${href}">
+      <span class="trip-step">${String(index + 1).padStart(2,'0')}</span>
+      <span class="trip-date">${stop.weekday ? stop.weekday + ' · ' : ''}${stop.date}</span>
+      <strong>${stop.city}</strong>
+      <em>${stop.hotel}</em>
+      <small>${label || ''}</small>
+    </a>`;
+  }).join('');
+}
+
 function scoreBlock(meta) {
   const s = meta?.scores || {};
   return `<div class="score-row">
@@ -24,6 +42,12 @@ function scoreBlock(meta) {
     <div class="score"><b>Tourist</b><span>${s.tourist || '-'}</span></div>
     <div class="score"><b>Late Food</b><span>${s.lateFood || '-'}</span></div>
   </div>`;
+}
+
+function cityTripLine(city) {
+  const stops = TRIP_STOPS.filter(s => s.city === city);
+  if (!stops.length) return '';
+  return `<div class="city-trip">${stops.map(s => `<span>${s.date} · ${s.hotel}</span>`).join('')}</div>`;
 }
 
 function card(p) {
@@ -52,6 +76,7 @@ function renderCities() {
         <div class="city-title">
           <div class="eyebrow">${places.length} Locations · offline gespeichert</div>
           <h2>${city}</h2>
+          ${cityTripLine(city)}
           <p class="vibe">${meta.note || ''}</p>
         </div>
         ${scoreBlock(meta)}
@@ -76,7 +101,7 @@ function renderOfflineMap(activeCity='all') {
     <defs><linearGradient id="routeGrad" x1="0" x2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#46d6e6"/></linearGradient></defs>
     <polyline points="${polyline}" fill="none" stroke="url(#routeGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
   </svg>${buttons}<div class="offline-map-note">Statische Offline-Übersicht. Die Buttons in den Karten öffnen Online-Suche/Google Maps, sobald Internet verfügbar ist.</div>`;
-  status(activeCity === 'all' ? `Offline-Karte: ${PLACES.length} Orte in ${CITY_ORDER.length} Städten.` : `Offline-Karte: ${activeCity} ausgewählt.`);
+  status(activeCity === 'all' ? `Route 14.–23.05.2026: ${PLACES.length} Orte in ${CITY_ORDER.length} Städten.` : `${activeCity} ausgewählt.`);
 }
 
 function fitAll(){ renderOfflineMap('all'); document.getElementById('karte')?.scrollIntoView({behavior:'smooth', block:'start'}); }
@@ -87,6 +112,7 @@ function focusCity(city){
 }
 function nearMe(){ alert('Diese Version ist vollständig offline. Standort und Live-Karte sind deaktiviert.'); }
 function initOffline(){
+  renderTripPlan();
   renderCities();
   renderOfflineMap('all');
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=offline2').catch(() => {});

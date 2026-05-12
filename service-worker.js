@@ -1,10 +1,10 @@
-const CACHE_NAME = 'route66-after-dark-offline-pwa-v2-20260512';
+const CACHE_NAME = 'route66-after-dark-offline-pwa-v3-20260512';
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=offline2",
-  "./app-offline.js?v=offline2",
-  "./adultData.js?v=offline2",
+  "./styles.css?v=offline3",
+  "./app-offline.js?v=offline3",
+  "./adultData.js?v=offline3",
   "./manifest.webmanifest",
   "./icons/icon-72.png",
   "./icons/icon-96.png",
