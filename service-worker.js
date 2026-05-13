@@ -1,10 +1,10 @@
-const CACHE_NAME = 'route66-after-dark-online-first-v5-20260513';
+const CACHE_NAME = 'route66-after-dark-online-first-v6-20260513';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=hybrid5',
-  './app-offline.js?v=hybrid5',
-  './adultData.js?v=hybrid5',
+  './styles.css?v=hybrid6',
+  './app-offline.js?v=hybrid6',
+  './adultData.js?v=hybrid6',
   './manifest.webmanifest'
 ];
 

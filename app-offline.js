@@ -165,7 +165,7 @@ function nearMe(){ alert(connectionOnline ? 'Online-Modus aktiv: Karte, Bilder, 
 
 function registerServiceWorker(){
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('./service-worker.js?v=hybrid5', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('./service-worker.js?v=hybrid6', { updateViaCache: 'none' })
     .then(reg => reg.update && reg.update())
     .catch(() => {});
 }
