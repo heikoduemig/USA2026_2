@@ -15,16 +15,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=hybrid3">
+<link rel="stylesheet" href="styles.css?v=hybrid4">
 </head>
 <body>
 <header class="hero">
   <div class="logo">✦ Route 66 After Dark Hybrid PWA</div>
   <h1>Nightlife Companion</h1>
-  <p class="subtitle">Installierbare Hybrid-App ohne Google Maps API, Places API und externe Bilder. Die App läuft offline; Website- und Google-Maps-Buttons öffnen sich nur bei Internet.</p>
+  <p class="subtitle">Installierbare Hybrid-App: online werden Karte, Bilder, Websites und Google-Maps-Links live geladen. Ohne Empfang schaltet die App automatisch auf gespeicherte Offline-Inhalte um.</p>
 
   <div class="topbar">
-    <button class="primary" onclick="nearMe()">Offline-Hinweis</button>
+    <button class="primary" onclick="nearMe()">Online/Offline</button>
     <button class="primary install-btn" onclick="installApp()">App installieren</button>
     <nav class="city-links" aria-label="Städte">
       <a href="#chicago">Chicago</a>
@@ -38,7 +38,7 @@
   <section class="glass map-panel" id="karte">
     <div class="map-head">
       <div>
-        <div class="eyebrow">Offline Karte</div>
+        <div class="eyebrow">Online / Offline Karte</div>
         <h2>Route 66 Übersicht</h2>
       </div>
       <div class="map-controls">
@@ -64,7 +64,7 @@
   <a href="#austin">Austin</a>
 </nav>
 
-<script src="adultData.js?v=hybrid3"></script>
-<script src="app-offline.js?v=hybrid3"></script>
+<script src="adultData.js?v=hybrid4"></script>
+<script src="app-offline.js?v=hybrid4"></script>
 </body>
 </html>

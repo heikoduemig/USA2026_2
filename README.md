@@ -4,8 +4,9 @@ Kostenfreies GitHub-Pages-Paket ohne Google Maps API, ohne Places API und ohne e
 
 ## Was ist hybrid?
 
-- Die App-Shell, Städte, Locations, Scores, Icons, Screenshots und die statische Übersichtskarte sind lokal/offline verfügbar.
-- Website-Buttons und Google-Maps-Buttons bleiben erhalten, öffnen aber nur normale externe Webseiten/Apps bei Internet. Dafür wird kein API-Key benötigt.
+- Online lädt die App Karte, Bilder, Websites und Google-Maps-Links live.
+- Ohne Empfang schaltet sie automatisch auf App-Shell, Städte, Locations, Scores, Icons, Screenshots und die statische Offline-Übersichtskarte zurück.
+- Website-Buttons und Google-Maps-Buttons bleiben normale externe Links. Dafür wird kein API-Key benötigt.
 
 ## Enthalten
 
@@ -27,7 +28,7 @@ Kostenfreies GitHub-Pages-Paket ohne Google Maps API, ohne Places API und ohne e
 
 ## Wichtig nach Updates
 
-Die Cache-Version ist `route66-after-dark-hybrid-pwa-v3-free-20260513`.
+Die Cache-Version ist `route66-after-dark-hybrid-pwa-v4-online-first-20260513`.
 Falls noch alte Inhalte erscheinen: Browser-/PWA-Cache löschen oder DevTools > Application > Service Workers > Unregister.
 
 ## Kostenfallen entfernt
