@@ -318,3 +318,63 @@
     min-height:64vh !important;
   }
 }
+
+
+/* v17 final map tile isolation + real card images */
+#map.real-map{
+  position:relative !important;
+  overflow:hidden !important;
+  background:#dde8f1 !important;
+}
+#map.real-map .leaflet-map,
+#map.real-map #leafletMap,
+#map.real-map .leaflet-container{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  border-radius:22px !important;
+  overflow:hidden !important;
+}
+#map.real-map .leaflet-container img{
+  max-width:none !important;
+  max-height:none !important;
+}
+#map.real-map .leaflet-tile{
+  width:256px !important;
+  height:256px !important;
+}
+#map.real-map .leaflet-pane,
+#map.real-map .leaflet-map-pane,
+#map.real-map .leaflet-tile-pane,
+#map.real-map .leaflet-overlay-pane,
+#map.real-map .leaflet-marker-pane,
+#map.real-map .leaflet-popup-pane,
+#map.real-map .leaflet-control-container{
+  display:block !important;
+}
+.real-photo{
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+.real-photo .club-name,
+.real-photo .art-caption{
+  z-index:3;
+}
+.real-photo:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.64));
+  z-index:1;
+}
+.photo-art .club-name,
+.photo-art .art-caption{
+  position:absolute;
+  z-index:4;
+}
+.photo-art.real-photo:before{
+  display:none!important;
+}

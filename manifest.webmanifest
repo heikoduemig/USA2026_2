@@ -1,8 +1,8 @@
 {
   "name": "Route 66 After Dark Hybrid PWA",
   "short_name": "After Dark",
-  "description": "Route 66 Nightlife Companion mit gefixter echter Online-Karte, Kartenbildern, Offline-Fallback und Favoriten.",
-  "start_url": "./index.html?v=161",
+  "description": "Route 66 Nightlife Companion mit stabiler Online-Karte, echten Kartenbildern, Offline-Fallback und Favoriten.",
+  "start_url": "./index.html?v=17",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
