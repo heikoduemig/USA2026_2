@@ -237,3 +237,84 @@
 .leaflet-control-attribution{
   font-size:10px;
 }
+
+
+/* v16.1 final map + card image fix */
+#map.real-map{
+  background:#0b1420 !important;
+  padding:0 !important;
+}
+#map.real-map .route-svg,
+#map.real-map .city-layer,
+#map.real-map .place-layer,
+#map.real-map .legend,
+#map.real-map .map-popup{
+  display:none !important;
+}
+.leaflet-map,
+#leafletMap{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:620px !important;
+  z-index:5 !important;
+  border-radius:22px;
+  overflow:hidden;
+}
+.leaflet-container{
+  width:100% !important;
+  height:100% !important;
+  min-height:620px !important;
+  background:#dbeafe !important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-marker-pane,
+.leaflet-popup-pane{
+  z-index:auto;
+}
+.leaflet-tile{
+  max-width:none !important;
+}
+.photo{
+  background:#111927 !important;
+}
+.photo-art.svg-photo{
+  position:absolute;
+  inset:0;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+.photo-art.svg-photo:before,
+.photo-art.svg-photo:after{
+  display:none !important;
+}
+.photo .photo-art{
+  width:100%;
+  height:100%;
+}
+.popup-photo .photo-art.svg-photo{
+  position:absolute;
+  inset:0;
+}
+.popup-photo{
+  position:relative;
+  overflow:hidden;
+}
+.real-photo{
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+@media(max-width:960px){
+  .leaflet-map,
+  #leafletMap,
+  .leaflet-container{
+    min-height:64vh !important;
+  }
+}

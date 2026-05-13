@@ -38,15 +38,44 @@ function categoryClass(cat=''){
 }
 
 function placeArt(p){
-  const cls = p.localImage || 'img-default';
+  const accent = p.accent || '#ff4fd8';
+  const label = p.imageLabel || 'Location-Bild';
+  const title = String(p.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (p.officialImage) {
-    return `<div class="photo-art real-photo" style="--accent:${p.accent || '#ff4fd8'};background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.72)),url('${p.officialImage}')">
-      <div class="club-name">${p.name}</div><div class="art-caption">${p.imageLabel || 'Official / Exterior'}</div>
+    return `<div class="photo-art real-photo" style="--accent:${accent};background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.72)),url('${p.officialImage}')">
+      <div class="club-name">${title}</div><div class="art-caption">${label}</div>
     </div>`;
   }
-  return `<div class="photo-art generated-photo ${cls}" style="--accent:${p.accent || '#ff4fd8'}">
-    <div class="neon-frame"></div><div class="stage-lines"></div><div class="city-silhouette"></div>
-    <div class="club-name">${p.name}</div><div class="art-caption">${p.imageLabel || 'Location-Artwork'}</div>
+  const svg = encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop stop-color="#071018"/><stop offset=".55" stop-color="${accent}"/><stop offset="1" stop-color="#0b1420"/>
+        </linearGradient>
+        <radialGradient id="spot" cx=".25" cy=".12" r=".55">
+          <stop stop-color="#ffffff" stop-opacity=".6"/><stop offset=".22" stop-color="${accent}" stop-opacity=".45"/><stop offset="1" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <rect width="900" height="420" fill="url(#bg)"/>
+      <rect width="900" height="420" fill="url(#spot)"/>
+      <path d="M0 330 C120 250 210 320 330 235 C480 130 610 255 900 120 L900 420 L0 420 Z" fill="#05070c" opacity=".72"/>
+      <g opacity=".42">
+        <rect x="60" y="185" width="24" height="170" fill="#ffffff"/>
+        <rect x="150" y="130" width="18" height="230" fill="#ffffff"/>
+        <rect x="730" y="160" width="22" height="200" fill="#ffffff"/>
+        <rect x="805" y="110" width="15" height="250" fill="#ffffff"/>
+      </g>
+      <g filter="url(#glow)" stroke="#fff" stroke-width="3" opacity=".82">
+        <path d="M100 95 L790 95 L825 130 L800 310 L120 310 L80 130 Z" fill="none"/>
+        <circle cx="120" cy="330" r="12" fill="${accent}"/>
+        <circle cx="190" cy="315" r="10" fill="#46d6e6"/>
+        <circle cx="760" cy="310" r="13" fill="#ffc857"/>
+      </g>
+      <text x="52" y="360" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#ffffff">${title}</text>
+      <text x="52" y="392" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#8ef4ff">${label}</text>
+    </svg>`);
+  return `<div class="photo-art svg-photo" style="--accent:${accent};background-image:url('data:image/svg+xml,${svg}')">
   </div>`;
 }
 
@@ -175,7 +204,8 @@ function renderMap(){
   el.innerHTML = '<div id="leafletMap" class="leaflet-map"></div>';
   leafletMap = L.map('leafletMap', {
     zoomControl: true,
-    scrollWheelZoom: false
+    scrollWheelZoom: false,
+    preferCanvas: true
   });
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -237,6 +267,8 @@ function renderMap(){
   } else {
     leafletMap.setView([36.5, -94.5], 5);
   }
+  setTimeout(() => leafletMap && leafletMap.invalidateSize(true), 80);
+  setTimeout(() => leafletMap && leafletMap.invalidateSize(true), 400);
 
   status(`Online-Karte aktiv: ${shown.length} Location-Marker auf OpenStreetMap.`);
 }
