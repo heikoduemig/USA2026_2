@@ -70,3 +70,91 @@
   content:"★ ";
   color:#ffc857;
 }
+
+
+/* v15 map and card-image fix */
+.map-error{
+  position:absolute;
+  inset:24px;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  background:rgba(0,0,0,.42);
+  color:#ffc857;
+  font-weight:900;
+  text-align:center;
+  padding:20px;
+}
+.generated-photo{
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb,var(--accent),white 30%), transparent 18%),
+    radial-gradient(circle at 82% 22%, rgba(70,214,230,.35), transparent 22%),
+    linear-gradient(135deg,rgba(8,15,26,.98),rgba(28,8,35,.98)) !important;
+}
+.generated-photo.img-city-premium{--accent:#ff4fd8}
+.generated-photo.img-neon-club{--accent:#b56cff}
+.generated-photo.img-stage-show{--accent:#46d6e6}
+.generated-photo.img-red-stage{--accent:#ff5f7e}
+.generated-photo.img-gold-lounge{--accent:#ffc857}
+.generated-photo.img-theatre{--accent:#7cf58a}
+.generated-photo.img-red-cabaret{--accent:#ff335f}
+.generated-photo.img-country-stage{--accent:#ff9f43}
+.generated-photo.img-blue-stage{--accent:#32d7ff}
+.generated-photo.img-purple-neon{--accent:#b56cff}
+.generated-photo.img-roadside-night{--accent:#ffc857}
+.generated-photo.img-casino{--accent:#7cf58a}
+.generated-photo.img-yellow-rose{--accent:#ffdc5e}
+.generated-photo.img-luxury-club{--accent:#d66cff}
+.generated-photo.img-xtc{--accent:#ff4f8b}
+.generated-photo.img-steakhouse{--accent:#ffb066}
+.generated-photo.img-latin-neon{--accent:#46d6e6}
+.generated-photo.img-perfect10{--accent:#7cf58a}
+.generated-photo.img-default{--accent:#ff4fd8}
+
+.generated-photo.img-city-premium:after,
+.generated-photo.img-neon-club:after,
+.generated-photo.img-stage-show:after,
+.generated-photo.img-red-stage:after,
+.generated-photo.img-gold-lounge:after,
+.generated-photo.img-theatre:after,
+.generated-photo.img-red-cabaret:after,
+.generated-photo.img-country-stage:after,
+.generated-photo.img-blue-stage:after,
+.generated-photo.img-purple-neon:after,
+.generated-photo.img-roadside-night:after,
+.generated-photo.img-casino:after,
+.generated-photo.img-yellow-rose:after,
+.generated-photo.img-luxury-club:after,
+.generated-photo.img-xtc:after,
+.generated-photo.img-steakhouse:after,
+.generated-photo.img-latin-neon:after,
+.generated-photo.img-perfect10:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(110deg, transparent 0 18%, rgba(255,255,255,.12) 19% 21%, transparent 22% 36%, rgba(255,255,255,.08) 37% 39%, transparent 40%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 34px);
+  mix-blend-mode:screen;
+  opacity:.85;
+}
+.city-silhouette{
+  position:absolute;
+  left:0;right:0;bottom:0;height:54%;
+  background:
+    linear-gradient(to top, rgba(0,0,0,.86), rgba(0,0,0,.18), transparent),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.72) 0 22px, transparent 22px 34px);
+  clip-path:polygon(0 65%,8% 55%,15% 62%,23% 35%,30% 58%,40% 48%,48% 64%,58% 42%,68% 58%,75% 45%,86% 63%,100% 52%,100% 100%,0 100%);
+}
+.place-pin{
+  pointer-events:auto;
+}
+.place-layer{
+  z-index:10;
+}
+.city-layer{
+  z-index:6;
+}
+.map-popup{
+  z-index:40;
+}
