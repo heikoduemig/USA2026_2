@@ -18,6 +18,12 @@ const CITY_IMAGES = {
   'Austin': 'https://images.unsplash.com/photo-1531218150217-54595bc2b934?auto=format&fit=crop&w=900&q=70'
 };
 
+function livePageShot(url){
+  if (!url) return '';
+  const safeUrl = String(url).startsWith('http') ? String(url) : `https://${String(url)}`;
+  return `https://image.thum.io/get/width/900/crop/520/noanimate/${encodeURI(safeUrl)}`;
+}
+
 let connectionOnline = navigator.onLine !== false;
 let lastCity = 'all';
 
@@ -26,7 +32,12 @@ function status(msg){ const el=document.getElementById('status'); if(el) el.text
 function maps(q){ return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; }
 function onlineWebsite(p){ return p.website || maps(p.query || `${p.name} ${p.city}`); }
 function cityCount(city){ return PLACES.filter(p => p.city === city).length; }
-function onlinePhoto(p){ return CITY_IMAGES[p.city] || CITY_IMAGES.Austin; }
+function onlinePhoto(p){
+  // Online: pro Location ein Live-Screenshot der Website/Google-Suche laden.
+  // Offline: lokaler CSS-Fallback bleibt aktiv.
+  return livePageShot(p.image || p.website || maps(p.query || `${p.name} ${p.city}`)) || CITY_IMAGES[p.city] || CITY_IMAGES.Austin;
+}
+function imageSearch(p){ return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(p.query || `${p.name} ${p.city}`)}`; }
 
 function setConnectionMode(){
   document.body.classList.toggle('is-offline', !connectionOnline);
@@ -77,6 +88,7 @@ function card(p) {
       <div class="actions">
         <a href="${onlineWebsite(p)}" target="_blank" rel="noopener">Website / Suche</a>
         <a class="secondary" href="${maps(p.query || `${p.name} ${p.city}`)}" target="_blank" rel="noopener">Google Maps</a>
+        <a class="secondary" href="${imageSearch(p)}" target="_blank" rel="noopener">Bilder</a>
       </div>
     </div>
   </article>`;
@@ -90,7 +102,7 @@ function updatePhotos(){
       el.classList.add('online-photo');
       el.style.backgroundImage = `linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.22)),url('${photo}')`;
       const badge = el.querySelector('.net-badge');
-      if (badge) badge.textContent = 'Online-Bild';
+      if (badge) badge.textContent = 'Live-Webbild';
     } else {
       el.classList.add('offline-photo');
       el.classList.remove('online-photo');
@@ -165,7 +177,7 @@ function nearMe(){ alert(connectionOnline ? 'Online-Modus aktiv: Karte, Bilder, 
 
 function registerServiceWorker(){
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('./service-worker.js?v=hybrid6', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('./service-worker.js?v=hybrid7', { updateViaCache: 'none' })
     .then(reg => reg.update && reg.update())
     .catch(() => {});
 }
