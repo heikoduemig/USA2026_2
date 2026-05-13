@@ -190,13 +190,15 @@ function renderMap(){
   leafletMap = L.map('leafletMap', {
     zoomControl: true,
     scrollWheelZoom: false,
-    preferCanvas: true
+    preferCanvas: true,
+    zoomSnap: 0.25,
+    zoomDelta: 0.5
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20,
-    subdomains: 'abcd',
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    detectRetina: false,
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(leafletMap);
 
   const shown = activeCity === 'all' ? PLACES : PLACES.filter(p => p.city === activeCity);
@@ -253,8 +255,19 @@ function renderMap(){
   } else {
     leafletMap.setView([36.5, -94.5], 5);
   }
-  setTimeout(() => leafletMap && leafletMap.invalidateSize(true), 80);
-  setTimeout(() => leafletMap && leafletMap.invalidateSize(true), 400);
+  requestAnimationFrame(() => {
+    if (leafletMap) leafletMap.invalidateSize(true);
+  });
+  setTimeout(() => {
+    if (leafletMap) {
+      leafletMap.invalidateSize(true);
+      if (markers.length) {
+        const group = L.featureGroup(markers);
+        leafletMap.fitBounds(group.getBounds().pad(.16), { animate:false });
+      }
+    }
+  }, 250);
+  setTimeout(() => leafletMap && leafletMap.invalidateSize(true), 900);
 
   status(`Online-Karte aktiv: ${shown.length} Location-Marker auf der Live-Karte.`);
 }
