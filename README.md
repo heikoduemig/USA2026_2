@@ -1,17 +1,19 @@
-# Route 66 After Dark Hybrid PWA v16.1
+# Route 66 After Dark Hybrid PWA v17
 
-Fix für:
-- Leaflet/OpenStreetMap füllt den gesamten Kartencontainer
-- keine Neon-Layer mehr über der Online-Karte
-- Tiles werden nicht mehr abgeschnitten
-- Kartenbilder sind jetzt sichtbare inline SVG-Artworks je Location
-- `officialImage` wird weiterhin unterstützt, falls echte freigegebene Bilder eingetragen werden
-- Offline-Fallback bleibt die Neon-Karte
-- PWA-Installation, Favoriten und Online/Offline bleiben erhalten
+Fixes:
+- Leaflet-Tiles isoliert, damit die echte Karte nicht mehr fleckig/abgeschnitten rendert
+- Wechsel auf CARTO/OpenStreetMap-Tiles
+- echte direkte Bildflächen in den Location-Karten per `cardImage`
+- SVG/Neon-Artwork bleibt als Fallback
+- alle Marker/Popups/Favoriten/PWA/Online-Offline bleiben enthalten
+
+Hinweis:
+Die `cardImage`-URLs sind direkt eingebettete Bildquellen. Wenn du später offizielle Außenansichten hast,
+trage sie pro Location als `officialImage` oder `cardImage` ein.
 
 Upload:
 1. Dateien ersetzen.
-2. Commit `v16.1 map and card images fix`.
+2. Commit `v17 real map images`.
 3. `/reset.html` öffnen.
 4. „Jetzt resetten“ klicken.
-5. `index.html?v=161&fresh=1` öffnen.
+5. `index.html?v=17&fresh=1` öffnen.
