@@ -6,6 +6,19 @@ let activeCity = 'all';
 let activePlace = null;
 let onlineState = navigator.onLine;
 let deferredInstallPrompt = null;
+let favorites = new Set(JSON.parse(localStorage.getItem('route66Favorites') || '[]'));
+
+function saveFavorites(){ localStorage.setItem('route66Favorites', JSON.stringify([...favorites])); }
+function isFavorite(idx){ return favorites.has(PLACES[idx].name); }
+function toggleFavorite(idx){
+  const name = PLACES[idx].name;
+  if (favorites.has(name)) favorites.delete(name); else favorites.add(name);
+  saveFavorites();
+  renderCities();
+  renderMap();
+  renderFavorites();
+}
+
 
 function slug(text){ return String(text).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function maps(q){ return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; }
@@ -24,6 +37,11 @@ function categoryClass(cat=''){
 }
 
 function placeArt(p){
+  if (p.officialImage) {
+    return `<div class="photo-art real-photo" style="--accent:${p.accent || '#ff4fd8'};background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.72)),url('${p.officialImage}')">
+      <div class="club-name">${p.name}</div><div class="art-caption">${p.imageLabel || 'Official / Exterior'}</div>
+    </div>`;
+  }
   return `<div class="photo-art" style="--accent:${p.accent || '#ff4fd8'}">
     <div class="neon-frame"></div><div class="stage-lines"></div>
     <div class="club-name">${p.name}</div><div class="art-caption">${p.imageLabel || 'Location-Bild'}</div>
@@ -53,7 +71,7 @@ function card(p, idx) {
         <a href="${onlineWebsite(p)}" target="_blank" rel="noopener">Website / Suche</a>
         <a class="secondary" href="${maps(p.query || `${p.name} ${p.city}`)}" target="_blank" rel="noopener">Google Maps</a>
         <a class="secondary" href="${imageSearch(p)}" target="_blank" rel="noopener">Bilder</a>
-        <button onclick="selectPlace(${idx})">Auf Karte</button>
+        <button onclick="selectPlace(${idx})">Auf Karte</button><button class="fav-btn ${isFavorite(idx) ? 'active' : ''}" onclick="toggleFavorite(${idx})">${isFavorite(idx) ? '★ Favorit' : '☆ Merken'}</button>
       </div>
     </div>
   </article>`;
@@ -74,10 +92,27 @@ function renderCities() {
   }).join('');
 }
 
+
+function renderFavorites(){
+  let section = document.getElementById('favorites');
+  if (!section) {
+    const main = document.getElementById('cities');
+    section = document.createElement('section');
+    section.id = 'favorites';
+    section.className = 'glass city-section favorites-section';
+    main?.prepend(section);
+  }
+  const favPlaces = PLACES.filter(p => favorites.has(p.name));
+  section.innerHTML = `<div class="city-top">
+    <div class="city-title"><div class="eyebrow">${favPlaces.length} gespeicherte Orte</div><h2>Favoriten</h2><p class="vibe">Lokal auf diesem Gerät gespeichert. Funktioniert auch nach dem Neuladen der App.</p></div>
+  </div>
+  ${favPlaces.length ? `<div class="place-grid">${favPlaces.map(p => card(p, PLACES.indexOf(p))).join('')}</div>` : `<p class="vibe">Noch keine Favoriten gespeichert. Tippe bei einer Location auf „☆ Merken“.</p>`}`;
+}
+
 function marker(p, idx){
   const active = activePlace === idx ? ' active' : '';
   return `<button class="place-pin ${categoryClass(p.category)}${active}" style="left:${p.map.x}%;top:${p.map.y}%;--accent:${p.accent || '#ff4fd8'}" onclick="selectPlace(${idx})" title="${p.name}">
-    <span class="pin-core"></span><span class="place-label">${p.name}<small>${p.city}</small></span>
+    <span class="pin-core"></span><span class="place-label ${p.map.x > 70 ? 'left-label' : ''}">${p.name}<small>${p.city}</small></span>
   </button>`;
 }
 
@@ -95,14 +130,14 @@ function popup(){
   const p = PLACES[activePlace];
   return `<aside class="map-popup">
     <button class="popup-close" onclick="clearPlace()">×</button>
-    <div class="popup-photo">${placeArt(p)}</div>
+    <div class="popup-photo">${placeArt(p)}<div class="mini-map-badge">📍 Marker ${activePlace + 1} / ${PLACES.length}</div></div>
     <div class="popup-body">
       <div class="eyebrow">${p.city} · ${p.category}</div><h3>${p.name}</h3>
       <p>${p.vibe || ''}<br>${p.address || ''}</p>
       <div class="actions">
         <a href="${maps(p.query || `${p.name} ${p.city}`)}" target="_blank" rel="noopener">Google Maps</a>
         <a class="secondary" href="${onlineWebsite(p)}" target="_blank" rel="noopener">Website</a>
-        <a class="secondary" href="${imageSearch(p)}" target="_blank" rel="noopener">Bilder</a>
+        <a class="secondary" href="${imageSearch(p)}" target="_blank" rel="noopener">Bilder</a><button class="fav-btn ${isFavorite(activePlace) ? 'active' : ''}" onclick="toggleFavorite(activePlace)">${isFavorite(activePlace) ? '★ Favorit' : '☆ Merken'}</button>
       </div>
     </div>
   </aside>`;
@@ -148,7 +183,7 @@ async function checkOnline(){
 }
 
 function init(){
-  renderCities(); renderMap(); checkOnline();
+  renderCities(); renderFavorites(); renderMap(); checkOnline();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=13').catch(()=>{});
 }
 window.addEventListener('online', checkOnline);
@@ -156,5 +191,5 @@ window.addEventListener('offline', checkOnline);
 window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); deferredInstallPrompt = event; document.body.classList.add('can-install'); status('App installierbar. Button „App installieren“ verwenden.'); });
 window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; document.body.classList.remove('can-install'); status('App wurde installiert.'); });
 
-window.nearMe = nearMe; window.fitAll = fitAll; window.focusCity = focusCity; window.selectPlace = selectPlace; window.clearPlace = clearPlace; window.installApp = installApp;
+window.nearMe = nearMe; window.fitAll = fitAll; window.focusCity = focusCity; window.selectPlace = selectPlace; window.clearPlace = clearPlace; window.toggleFavorite = toggleFavorite; window.installApp = installApp;
 document.addEventListener('DOMContentLoaded', init);

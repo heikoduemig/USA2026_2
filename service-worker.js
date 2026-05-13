@@ -1,5 +1,5 @@
-const CACHE_NAME = 'route66-after-dark-v13-20260513';
-const APP_SHELL = ['./','./index.html','./styles.css?v=13','./app-offline.js?v=13','./adultData.js?v=13','./manifest.webmanifest?v=13','./reset.html','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-192.png','./icons/maskable-512.png'];
+const CACHE_NAME = 'route66-after-dark-v14-20260513';
+const APP_SHELL = ['./','./index.html','./styles.css?v=14','./app-offline.js?v=14','./adultData.js?v=14','./manifest.webmanifest?v=14','./reset.html','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-192.png','./icons/maskable-512.png'];
 const shouldSkip = request => { const url = new URL(request.url); return request.method !== 'GET' || url.origin !== self.location.origin || url.protocol === 'chrome-extension:'; };
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
