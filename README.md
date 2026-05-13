@@ -1,17 +1,18 @@
-# Route 66 After Dark Hybrid PWA v18
+# Route 66 After Dark Hybrid PWA v21
 
-Finaler Leaflet-Fix:
-- Leaflet-CSS lokal in styles.css eingebettet
-- keine Abhängigkeit vom externen Leaflet-CSS
-- Kacheln werden absolut positioniert statt als normale Bilder zu fließen
-- globale Bildregeln überschreiben Leaflet-Tiles nicht mehr
-- echte Online-Karte bleibt aktiv
-- Offline-Neonkarte bleibt Fallback
-- Kartenbilder/Favoriten/PWA bleiben enthalten
+Komplettpaket für GitHub-Upload.
 
-Upload:
-1. Dateien ersetzen.
-2. Commit `v18 leaflet css fixed`.
-3. `/reset.html` öffnen.
-4. „Jetzt resetten“ klicken.
-5. `index.html?v=18&fresh=1` öffnen.
+## Änderungen in v21
+- Neueste `Liste.kmz` als Koordinatenquelle übernommen
+- 15 Live-Map-Marker in `adultData.js` aktualisiert
+- Offline-Neonkarte `map:{x,y}` aus den GPS-Werten neu ausgerichtet
+- Cache-/Service-Worker-Version auf v21 erhöht
+- Reset-Seite auf v21 angepasst
+
+## Upload
+1. ZIP entpacken.
+2. Alle Dateien in GitHub hochladen und vorhandene Dateien ersetzen.
+3. Commit z. B. `v21 latest liste coordinates`.
+4. `/reset.html` öffnen.
+5. „Jetzt resetten“ klicken.
+6. `index.html?v=21&fresh=1` öffnen.

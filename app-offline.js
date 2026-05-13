@@ -322,7 +322,7 @@ function init(){
     renderFavorites();
     renderMap();
     checkOnline();
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=15').catch(()=>{});
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=20').catch(()=>{});
   } catch (err) {
     console.error(err);
     status('JavaScript-Fehler: ' + err.message);
