@@ -1,17 +1,17 @@
-# Route 66 After Dark Hybrid PWA v15
+# Route 66 After Dark Hybrid PWA v16 REAL MAP
 
-Fix-Version für:
-- Map initialisiert stabiler
-- Fehleranzeige, falls adultData.js nicht geladen wird
-- alle Location-Marker bleiben klickbar
-- Kartenbilder sind jetzt lokale, individuelle Bild-Artworks pro Location
-- `officialImage` bleibt unterstützt, falls du später echte freigegebene Bilder einträgst
-- Favoriten bleiben lokal gespeichert
-- PWA-Installation bleibt aktiv
-- Online/Offline bleibt aktiv
+Neu:
+- echte Online-Karte mit Leaflet + OpenStreetMap
+- keine Google Maps API nötig
+- alle Locations als echte Kartenmarker mit Koordinaten
+- Popup je Marker mit Google Maps / Website / Bilder
+- Route-Linie zwischen Städten
+- wenn Leaflet/Internet nicht verfügbar ist: automatischer Fallback auf Neon-Offline-Karte
+- PWA-Installation, Favoriten, Online/Offline bleiben erhalten
 
-Nach Upload:
-1. Commit `v15 map images fix`
-2. `/reset.html` öffnen
-3. „Jetzt resetten“ klicken
-4. `index.html?v=15&fresh=1` öffnen
+Upload:
+1. ZIP hochladen / Dateien ersetzen.
+2. Commit `v16 real map`.
+3. `/reset.html` öffnen.
+4. „Jetzt resetten“ klicken.
+5. `index.html?v=16&fresh=1` öffnen.

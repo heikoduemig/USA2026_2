@@ -6,6 +6,8 @@ let activeCity = 'all';
 let activePlace = null;
 let onlineState = navigator.onLine;
 let deferredInstallPrompt = null;
+let leafletMap = null;
+let leafletLayer = null;
 let favorites = new Set(JSON.parse(localStorage.getItem('route66Favorites') || '[]'));
 
 function saveFavorites(){ localStorage.setItem('route66Favorites', JSON.stringify([...favorites])); }
@@ -153,7 +155,93 @@ function popup(){
   </aside>`;
 }
 
+
 function renderMap(){
+  const el = document.getElementById('map');
+  if (!el) return;
+  const canUseLeaflet = onlineState && window.L && PLACES.length && PLACES.every(p => p.coords);
+  if (!canUseLeaflet) {
+    el.classList.remove('real-map');
+    if (leafletMap) {
+      leafletMap.remove();
+      leafletMap = null;
+      leafletLayer = null;
+    }
+    renderFallbackMap();
+    return;
+  }
+
+  el.classList.add('real-map');
+  el.innerHTML = '<div id="leafletMap" class="leaflet-map"></div>';
+  leafletMap = L.map('leafletMap', {
+    zoomControl: true,
+    scrollWheelZoom: false
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(leafletMap);
+
+  const shown = activeCity === 'all' ? PLACES : PLACES.filter(p => p.city === activeCity);
+  const markers = [];
+
+  shown.forEach((p, idxShown) => {
+    const idx = PLACES.indexOf(p);
+    const color = p.accent || '#ff4fd8';
+    const icon = L.divIcon({
+      className: 'route66-leaflet-pin',
+      html: `<button class="leaflet-pin-dot" style="--accent:${color}" title="${p.name}"></button>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const marker = L.marker([p.coords.lat, p.coords.lng], { icon }).addTo(leafletMap);
+    marker.bindPopup(`
+      <div class="leaflet-popup-card">
+        <strong>${p.name}</strong>
+        <small>${p.city} · ${p.category}</small>
+        <p>${p.address || ''}</p>
+        <div class="leaflet-popup-actions">
+          <a href="${maps(p.query || `${p.name} ${p.city}`)}" target="_blank" rel="noopener">Google Maps</a>
+          <a href="${onlineWebsite(p)}" target="_blank" rel="noopener">Website</a>
+          <a href="${imageSearch(p)}" target="_blank" rel="noopener">Bilder</a>
+        </div>
+      </div>
+    `);
+    marker.on('click', () => { activePlace = idx; activeCity = p.city; });
+    markers.push(marker);
+  });
+
+  const routeCoords = CITY_ORDER
+    .map(city => {
+      const places = PLACES.filter(p => p.city === city && p.coords);
+      if (!places.length) return null;
+      const lat = places.reduce((s,p)=>s+p.coords.lat,0)/places.length;
+      const lng = places.reduce((s,p)=>s+p.coords.lng,0)/places.length;
+      return [lat,lng];
+    })
+    .filter(Boolean);
+
+  if (routeCoords.length > 1) {
+    L.polyline(routeCoords, {
+      color: '#ff4fd8',
+      weight: 4,
+      opacity: .75
+    }).addTo(leafletMap);
+  }
+
+  if (markers.length) {
+    const group = L.featureGroup(markers);
+    leafletMap.fitBounds(group.getBounds().pad(.16));
+  } else {
+    leafletMap.setView([36.5, -94.5], 5);
+  }
+
+  status(`Online-Karte aktiv: ${shown.length} Location-Marker auf OpenStreetMap.`);
+}
+
+function renderFallbackMap(){
   const el = document.getElementById('map');
   if (!el) return;
   if (!PLACES.length) {
