@@ -33,9 +33,9 @@ function maps(q){ return `https://www.google.com/maps/search/?api=1&query=${enco
 function onlineWebsite(p){ return p.website || maps(p.query || `${p.name} ${p.city}`); }
 function cityCount(city){ return PLACES.filter(p => p.city === city).length; }
 function onlinePhoto(p){
-  // Online: pro Location ein Live-Screenshot der Website/Google-Suche laden.
-  // Offline: lokaler CSS-Fallback bleibt aktiv.
-  return livePageShot(p.image || p.website || maps(p.query || `${p.name} ${p.city}`)) || CITY_IMAGES[p.city] || CITY_IMAGES.Austin;
+  // Online: zuerst freigegebene/öffentliche Bilder der Location laden.
+  // Nur wenn kein Bild hinterlegt ist, wird als Notfall ein Website-Screenshot genutzt.
+  return p.image || livePageShot(p.website || maps(p.query || `${p.name} ${p.city}`)) || CITY_IMAGES[p.city] || CITY_IMAGES.Austin;
 }
 function imageSearch(p){ return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(p.query || `${p.name} ${p.city}`)}`; }
 
@@ -102,7 +102,7 @@ function updatePhotos(){
       el.classList.add('online-photo');
       el.style.backgroundImage = `linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.22)),url('${photo}')`;
       const badge = el.querySelector('.net-badge');
-      if (badge) badge.textContent = 'Live-Webbild';
+      if (badge) badge.textContent = 'Location-Bild';
     } else {
       el.classList.add('offline-photo');
       el.classList.remove('online-photo');
@@ -177,7 +177,7 @@ function nearMe(){ alert(connectionOnline ? 'Online-Modus aktiv: Karte, Bilder, 
 
 function registerServiceWorker(){
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('./service-worker.js?v=hybrid7', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('./service-worker.js?v=hybrid8', { updateViaCache: 'none' })
     .then(reg => reg.update && reg.update())
     .catch(() => {});
 }

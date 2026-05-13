@@ -41,3 +41,7 @@ Falls noch alte Inhalte erscheinen: Browser-/PWA-Cache löschen oder DevTools > 
 - keine API-Keys
 
 Google-Maps-Links sind normale Links wie `https://www.google.com/maps/search/?api=1&query=...` und verursachen keine Google-Cloud-API-Kosten.
+
+
+## v8
+Online-Bilder wurden auf direkte öffentliche/freigegebene Bilder der jeweiligen offiziellen Location-Seiten umgestellt, soweit verfügbar. Für Locations ohne gut erreichbares offizielles Bild bleibt ein neutraler Online-Fallback erhalten.
