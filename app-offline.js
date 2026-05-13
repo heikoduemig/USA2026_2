@@ -10,17 +10,51 @@ const CITY_POSITIONS = {
   'Austin': {x: 28, y: 92}
 };
 
+const CITY_IMAGES = {
+  'Chicago': 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=900&q=70',
+  'St. Louis': 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=900&q=70',
+  'Tulsa': 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=70',
+  'Lawton': 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=70',
+  'Austin': 'https://images.unsplash.com/photo-1531218150217-54595bc2b934?auto=format&fit=crop&w=900&q=70'
+};
+
+let connectionOnline = navigator.onLine !== false;
+let lastCity = 'all';
+
 function slug(city){ return String(city).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function status(msg){ const el=document.getElementById('status'); if(el) el.textContent=msg; }
-function isOnline(){ return navigator.onLine !== false; }
-function setConnectionMode(){ document.body.classList.toggle('is-offline', !isOnline()); document.body.classList.toggle('is-online', isOnline()); }
 function maps(q){ return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; }
 function onlineWebsite(p){ return p.website || maps(p.query || `${p.name} ${p.city}`); }
-function onlinePhoto(p){
-  const q = encodeURIComponent(`${p.city} nightlife neon city`.replace(/\s+/g, ' '));
-  return `https://source.unsplash.com/900x520/?${q}`;
-}
 function cityCount(city){ return PLACES.filter(p => p.city === city).length; }
+function onlinePhoto(p){ return CITY_IMAGES[p.city] || CITY_IMAGES.Austin; }
+
+function setConnectionMode(){
+  document.body.classList.toggle('is-offline', !connectionOnline);
+  document.body.classList.toggle('is-online', connectionOnline);
+}
+
+async function checkOnline(){
+  if (navigator.onLine === false) return false;
+  try {
+    const response = await fetch(`./manifest.webmanifest?online-check=${Date.now()}`, {
+      method: 'GET',
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
+    return !!response && response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function refreshConnectionAndRender(city = lastCity){
+  lastCity = city;
+  status('Verbindung wird geprüft ...');
+  connectionOnline = await checkOnline();
+  setConnectionMode();
+  renderMap(city);
+  updatePhotos();
+}
 
 function scoreBlock(meta) {
   const s = meta?.scores || {};
@@ -35,7 +69,7 @@ function scoreBlock(meta) {
 function card(p) {
   const photo = onlinePhoto(p);
   return `<article class="place">
-    <div class="photo online-photo" data-photo="${photo}" style="background-image:linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.22)),url('${photo}')"><span class="tier">${p.priority}</span><span class="net-badge">Online-Bild</span></div>
+    <div class="photo offline-photo" data-photo="${photo}"><span class="tier">${p.priority}</span><span class="net-badge">Offline-Fallback</span></div>
     <div class="body">
       <h3>${p.name}</h3>
       <div class="badges"><span class="badge gold">⭐ ${p.rating || '4.0+'}</span><span class="badge pink">${p.category}</span></div>
@@ -48,6 +82,25 @@ function card(p) {
   </article>`;
 }
 
+function updatePhotos(){
+  document.querySelectorAll('.photo[data-photo]').forEach(el => {
+    if (connectionOnline) {
+      const photo = el.getAttribute('data-photo');
+      el.classList.remove('offline-photo');
+      el.classList.add('online-photo');
+      el.style.backgroundImage = `linear-gradient(135deg,rgba(70,214,230,.35),rgba(255,79,216,.22)),url('${photo}')`;
+      const badge = el.querySelector('.net-badge');
+      if (badge) badge.textContent = 'Online-Bild';
+    } else {
+      el.classList.add('offline-photo');
+      el.classList.remove('online-photo');
+      el.style.backgroundImage = '';
+      const badge = el.querySelector('.net-badge');
+      if (badge) badge.textContent = 'Offline-Fallback';
+    }
+  });
+}
+
 function renderCities() {
   const root = document.getElementById('cities');
   if (!root) return;
@@ -57,7 +110,7 @@ function renderCities() {
     return `<section class="glass city-section" id="${slug(city)}">
       <div class="city-top">
         <div class="city-title">
-          <div class="eyebrow">${places.length} Locations · online frisch / offline gespeichert</div>
+          <div class="eyebrow">${places.length} Locations · online live / offline gespeichert</div>
           <h2>${city}</h2>
           <p class="vibe">${meta.note || ''}</p>
         </div>
@@ -71,10 +124,10 @@ function renderCities() {
 function renderOnlineMap(activeCity='all') {
   const el = document.getElementById('map');
   if (!el) return;
-  const selected = activeCity === 'all' ? 'Route 66 Chicago St. Louis Tulsa Lawton Austin' : activeCity;
+  const selected = activeCity === 'all' ? 'Route 66 Chicago St. Louis Tulsa Lawton Austin' : `${activeCity} nightlife`;
   el.className = 'online-map';
   el.innerHTML = `<iframe title="Online Google Maps Übersicht" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(selected)}&output=embed"></iframe>`;
-  status(activeCity === 'all' ? `Online-Modus: Karte und Bilder werden live geladen.` : `Online-Modus: ${activeCity} live geladen.`);
+  status(activeCity === 'all' ? 'Online-Modus aktiv: Karte und Bilder werden live geladen.' : `Online-Modus aktiv: ${activeCity} live geladen.`);
 }
 
 function renderOfflineMap(activeCity='all') {
@@ -92,42 +145,50 @@ function renderOfflineMap(activeCity='all') {
   el.innerHTML = `<svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
     <defs><linearGradient id="routeGrad" x1="0" x2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#46d6e6"/></linearGradient></defs>
     <polyline points="${polyline}" fill="none" stroke="url(#routeGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
-  </svg>${buttons}<div class="offline-map-note">Kostenfreie Offline-Übersicht. Website- und Google-Maps-Buttons öffnen extern, sobald Internet verfügbar ist.</div>`;
-  status(activeCity === 'all' ? `Offline-Karte: ${PLACES.length} Orte in ${CITY_ORDER.length} Städten.` : `Offline-Karte: ${activeCity} ausgewählt.`);
+  </svg>${buttons}<div class="offline-map-note">Offline-Modus: keine Verbindung erkannt. Gespeicherte Inhalte bleiben nutzbar.</div>`;
+  status(activeCity === 'all' ? `Offline-Modus aktiv: ${PLACES.length} Orte in ${CITY_ORDER.length} Städten.` : `Offline-Modus aktiv: ${activeCity} ausgewählt.`);
 }
 
 function renderMap(activeCity='all'){
   setConnectionMode();
-  if (isOnline()) renderOnlineMap(activeCity);
+  if (connectionOnline) renderOnlineMap(activeCity);
   else renderOfflineMap(activeCity);
 }
-function fitAll(){ renderMap('all'); document.getElementById('karte')?.scrollIntoView({behavior:'smooth', block:'start'}); }
+
+function fitAll(){ refreshConnectionAndRender('all'); document.getElementById('karte')?.scrollIntoView({behavior:'smooth', block:'start'}); }
 function focusCity(city){
-  renderMap(city);
+  refreshConnectionAndRender(city);
   const target = document.getElementById(slug(city));
   if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
-function nearMe(){ alert(isOnline() ? 'Online-Modus: Karte, Bilder, Website- und Google-Maps-Links werden live geladen. Ohne Empfang schaltet die App automatisch auf Offline-Cache um.' : 'Offline-Modus: Keine Verbindung. Die App nutzt gespeicherte Inhalte und die Offline-Übersicht.'); }
+function nearMe(){ alert(connectionOnline ? 'Online-Modus aktiv: Karte, Bilder, Website- und Google-Maps-Links werden live geladen. Ohne Empfang schaltet die App automatisch auf Offline-Cache um.' : 'Offline-Modus aktiv: keine Verbindung erkannt. Die App nutzt gespeicherte Inhalte und die Offline-Übersicht.'); }
+
+function registerServiceWorker(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('./service-worker.js?v=hybrid5', { updateViaCache: 'none' })
+    .then(reg => reg.update && reg.update())
+    .catch(() => {});
+}
+
 function initOffline(){
   setConnectionMode();
   renderCities();
-  renderMap('all');
-  window.addEventListener('online', () => renderMap('all'));
-  window.addEventListener('offline', () => renderMap('all'));
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=hybrid4').catch(() => {});
+  refreshConnectionAndRender('all');
+  window.addEventListener('online', () => refreshConnectionAndRender(lastCity));
+  window.addEventListener('offline', () => refreshConnectionAndRender(lastCity));
+  registerServiceWorker();
 }
 window.nearMe = nearMe;
 window.fitAll = fitAll;
 window.focusCity = focusCity;
 document.addEventListener('DOMContentLoaded', initOffline);
 
-
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', event => {
   event.preventDefault();
   deferredInstallPrompt = event;
   document.body.classList.add('can-install');
-  status('Offline-App bereit. Du kannst sie jetzt installieren.');
+  status('App bereit. Du kannst sie jetzt installieren.');
 });
 window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
