@@ -1,59 +1,36 @@
-const CACHE_NAME = 'route66-after-dark-online-first-v8-official-images-20260513';
+const CACHE_NAME = 'route66-after-dark-v10-20260513';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=hybrid8',
-  './app-offline.js?v=hybrid8',
-  './adultData.js?v=hybrid8',
-  './manifest.webmanifest'
+  './styles.css?v=10',
+  './app-offline.js?v=10',
+  './adultData.js?v=10',
+  './manifest.webmanifest?v=10',
+  './reset.html'
 ];
 
-function isGet(request) { return request.method === 'GET'; }
-function isSameOrigin(request) { return new URL(request.url).origin === self.location.origin; }
-function isNavigate(request) { return request.mode === 'navigate'; }
-
-async function cachePut(request, response) {
-  if (!response || !response.ok || !isSameOrigin(request)) return;
-  const cache = await caches.open(CACHE_NAME);
-  await cache.put(request, response.clone());
-}
-
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request, { cache: 'no-store' });
-    cachePut(request, response).catch(() => {});
-    return response;
-  } catch (error) {
-    const cached = await caches.match(request, { ignoreSearch: true });
-    if (cached) return cached;
-    if (isNavigate(request)) return caches.match('./index.html');
-    throw error;
-  }
-}
+const shouldSkip = request => {
+  const url = new URL(request.url);
+  return request.method !== 'GET' || url.origin !== self.location.origin || url.protocol === 'chrome-extension:';
+};
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => Promise.allSettled(APP_SHELL.map(url => cache.add(url))))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (!isGet(request)) return;
-
-  // External images, Google Maps, websites etc. are never cached/intercepted here.
-  if (!isSameOrigin(request)) return;
-
-  // Online first: only fall back to the cache when the network actually fails.
-  event.respondWith(networkFirst(request));
+  if (shouldSkip(event.request)) return;
+  event.respondWith(
+    fetch(event.request).then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)).catch(() => {});
+      }
+      return response;
+    }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+  );
 });
